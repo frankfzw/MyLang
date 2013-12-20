@@ -40,7 +40,7 @@ interface Node {
   public int genPara();
   
   //write intermediate code
-  public void writeInter(String content) throws IOException;
+  public void writeInter() throws IOException;
   
 }
 /* JavaCC - OriginalChecksum=124197fbf8d9be82b6049afcbf66c1fb (do not edit this line) */

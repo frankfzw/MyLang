@@ -13,6 +13,7 @@ public class SimpleNode implements Node {
   protected static int label = 0;
   protected static int para = 0;
   protected static int oldLabel = 0;
+  protected String content;
   
 
   public SimpleNode(int i) {
@@ -97,7 +98,7 @@ public class SimpleNode implements Node {
 	}
 	
 	@Override
-	public void writeInter(String content) throws IOException {
+	public void writeInter() throws IOException {
 		// TODO Auto-generated method stub
 		//write to file
 		File file = new File("interCode.txt");
@@ -118,14 +119,7 @@ public class SimpleNode implements Node {
 	}
   
   
-  
-  
-  
-  
-  
-  
-  
-  
+
   
   
 }

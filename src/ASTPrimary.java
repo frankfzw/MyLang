@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ASTPrimary extends SimpleNode {
   private String name;
 
@@ -28,11 +30,12 @@ public class ASTPrimary extends SimpleNode {
 	return "Primary";
   }
   
-  public String genInter() {
-		String content = "\nt"
+  public int genInter() throws IOException {
+		content = "\nt"
 				+ Integer.toString(genPara()) + " = "
 				+ name;
-		return content;
+		writeInter();
+		return para;
 	}
 
 }

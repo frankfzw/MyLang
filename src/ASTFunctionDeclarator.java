@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ASTFunctionDeclarator extends SimpleNode {
 	private String name;
 	private String type;
@@ -26,12 +28,13 @@ public class ASTFunctionDeclarator extends SimpleNode {
     super(p, id);
   }
 
-  public String genInter() {
-	  String content = "\n"
+  public int genInter() throws IOException {
+	  content = "\n"
 			  + type + " "
 			  + name + " "
 			  + "proc ";
-	  return content;
+	  writeInter();
+	  return 0;
   } 
   
   

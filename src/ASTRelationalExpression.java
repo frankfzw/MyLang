@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ASTRelationalExpression extends SimpleNode {
 	private String leftExp;
 	private String rightExp;
@@ -35,11 +37,11 @@ public class ASTRelationalExpression extends SimpleNode {
 		super(p, id);
 	}
 	
-	public String genInter() {
-		String content = "\nif t"
-				+ Integer.toString(para - 1)
+	public int genInter(int paraL, int paraR) throws IOException {
+		content = "\nif t"
+				+ Integer.toString(paraL)
 				+ " " + op
-				+ " t" + Integer.toString(para)
+				+ " t" + Integer.toString(paraR)
 				+ " goto L" + Integer.toString(genLabel())
 				+ "\ngoto L" + Integer.toString(genLabel());
 		content += "\nL"
@@ -50,7 +52,8 @@ public class ASTRelationalExpression extends SimpleNode {
 				+ Integer.toString(genOldLabel())
 				+ ":\nt" + Integer.toString(para)
 				+ " = 0";
-		return content;
+		writeInter();
+		return para;
 	}
 
 }

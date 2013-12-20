@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 
 public class ASTFunctionParameter extends SimpleNode 
 {
@@ -29,12 +31,13 @@ public class ASTFunctionParameter extends SimpleNode
     super(p, id);
   }
 
-  public String genInter() {
-	  String content = name
+  public int genInter() throws IOException {
+	  content = name
 			  + ":"
 			  + type
 			  + " ";
-	  return content;
+	  writeInter();
+	  return 0;
   }
   
 }

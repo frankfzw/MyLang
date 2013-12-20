@@ -254,8 +254,8 @@ void FunctionDeclarator() :
 	id = MyID()
 	{		jjtThis.setType(t.image);
 		jjtThis.setName(id);
-		String temp = jjtThis.genInter();
-		jjtThis.writeInter(temp);	}
+		jjtThis.genInter();
+	}
 	"(" (FunctionParameterList())? ")" FunctionBody()
 }
 
@@ -276,8 +276,8 @@ void FunctionParameter() :
 	{
 		jjtThis.setType(t.image);
 		jjtThis.setName(id);
-		String temp = jjtThis.genInter();
-		jjtThis.writeInter(temp);	}
+		jjtThis.genInter();
+	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
@@ -415,8 +415,8 @@ void AssignmentExpression() :
 	{
 		jjtThis.setLeftSide(lhs);
 		jjtThis.setOp(op.image);
-		String temp = jjtThis.genInter();
-		jjtThis.writeInter(temp);	}
+		jjtThis.genInter(0, paraR);
+	}
 }
 
 /** conditional expression. */
@@ -472,8 +472,8 @@ void RelationalExpression() :
 		(op = "<"| op = ">" | op = "<=" | op = ">=") ShiftExpression()
 		{
 			jjtThis.setOp(op.image);
-			String temp = jjtThis.genInter();
-			jjtThis.writeInter(temp);		}
+			jjtThis.genInter(paraL, paraR);
+		}
 	)*
 }
 
@@ -488,8 +488,7 @@ void ShiftExpression() :
 		(op = "<<" | op = ">>") AdditiveExpression()
 		{
 			jjtThis.setOp(op.image);
-			String temp = jjtThis.genInter();
-			jjtThis.writeInter(temp);
+			jjtThis.genInter(paraL, paraR);
 		}
 	)*
 }
@@ -505,8 +504,7 @@ void AdditiveExpression() :
 		(op = "+" | op = "-") MultiplicativeExpression()
 		{
 			jjtThis.setOp(op.image);
-			String temp = jjtThis.genInter();
-			jjtThis.writeInter(temp);
+			jjtThis.genInter(paraL, paraR);
 		}
 	)*
 }
@@ -522,8 +520,7 @@ void MultiplicativeExpression() :
 		(op = "*" | op = "/" | op = "%") UnaryExpression()
 		{
 			jjtThis.setOp(op.image);
-			String temp = jjtThis.genInter();
-			jjtThis.writeInter(temp);
+			jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	
@@ -570,8 +567,8 @@ void Primary() :
 	t1 = <LITERAL >
 	{
 		jjtThis.setName(t1.image);
-		String temp = jjtThis.genInter();
-		jjtThis.writeInter(temp);	}
+		jjtThis.genInter();
+	}
 	| t1 = <INTEGER_LITERAL >
 	{
 		jjtThis.setName(t1.image);

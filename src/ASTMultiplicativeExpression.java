@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ASTMultiplicativeExpression extends SimpleNode {
 	private String op;
 	
@@ -17,12 +19,13 @@ public class ASTMultiplicativeExpression extends SimpleNode {
 		super(p, id);
 	}
 	
-	public String genInter() {
-		String content = "\nt"
+	public int genInter(int paraL, int paraR) throws IOException {
+		content = "\nt"
 				+ Integer.toString(genPara()) + " = "
-				+ " t" + Integer.toString(para - 1)
+				+ " t" + Integer.toString(paraL)
 				+ " " + op
-				+ " t" + Integer.toString(para - 2);
-		return content;
+				+ " t" + Integer.toString(paraR);
+		writeInter();
+		return para;
 	}
 }

@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ASTAssignmentExpression extends SimpleNode {
 	private String leftSide;
 	private String op;
@@ -26,11 +28,12 @@ public class ASTAssignmentExpression extends SimpleNode {
 		super(p, id);
 	}
 	
-	public String genInter() {
-		String content = "\n" 
+	public int genInter(int paraL, int paraR) throws IOException {
+		content = "\n" 
 				+ leftSide +" "
 				+ op + " t"
-				+ Integer.toString(para);
-		return content;
+				+ Integer.toString(paraR);
+		writeInter();
+		return para;
 	}
 }
