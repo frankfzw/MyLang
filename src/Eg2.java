@@ -202,7 +202,10 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_3;
         }
         jj_consume_token(42);
-        MyID();
+        id = MyID();
+                        if (curEnv.contains(id))
+                                {if (true) throw new ParseException("Redifine: "+ id);}
+                        curEnv.put(id, t.image);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ASSIGNMENT_EQUAL_OPERATOR:
         case 43:
@@ -269,13 +272,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
 /** struct declaration. */
   final public void StructDeclaration() throws ParseException {
-                            /*@bgen(jjtree) StructDeclaration */
-  ASTStructDeclaration jjtn000 = new ASTStructDeclaration(JJTSTRUCTDECLARATION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+ /*@bgen(jjtree) StructDeclaration */
+        ASTStructDeclaration jjtn000 = new ASTStructDeclaration(JJTSTRUCTDECLARATION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);Token t = null;
+        String id;
     try {
-      jj_consume_token(STRUCT);
-      MyID();
+      t = jj_consume_token(STRUCT);
+      id = MyID();
+                if (curEnv.contains(id))
+                        {if (true) throw new ParseException("Redifine: "+ id);}
+                curEnv.put(id, t.image);
       StructBody();
     } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -300,14 +307,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
 /** struct body. */
   final public void StructBody() throws ParseException {
-                    /*@bgen(jjtree) StructBody */
-  ASTStructBody jjtn000 = new ASTStructBody(JJTSTRUCTBODY);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+ /*@bgen(jjtree) StructBody */
+        ASTStructBody jjtn000 = new ASTStructBody(JJTSTRUCTBODY);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);Env savedEnv = curEnv;
+        curEnv = new Env(curEnv);
     try {
       jj_consume_token(45);
-                Env savedEnv = curEnv;
-                curEnv = new Env(curEnv);
       StructDeclarations();
       jj_consume_token(46);
           jjtree.closeNodeScope(jjtn000, true);
@@ -428,6 +434,11 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                 jjtn000.setType(t.image);
                 jjtn000.setName(id);
                 jjtn000.genInter();
+                if (curEnv.contains(id))
+                        {if (true) throw new ParseException("Redifine: "+ id);}
+                curEnv.put(id, t.image);
+                Env savedEnv = curEnv;
+                curEnv = new Env(curEnv);
       jj_consume_token(48);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VARIABLE_TYPE:
@@ -440,6 +451,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       }
       jj_consume_token(49);
       FunctionBody();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                curEnv = savedEnv;
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -524,6 +538,10 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                 jjtn000.setType(t.image);
                 jjtn000.setName(id);
                 jjtn000.genInter();
+
+                if (curEnv.contains(id))
+                        {if (true) throw new ParseException("Redifine: "+ id);}
+                curEnv.put(id, t.image);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_EQUAL_OPERATOR:
       case 43:
@@ -2115,6 +2133,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jjtc000 = false;
                 jjtn000.setName(lhs);
                 {if (true) return jjtn000.genInter();}
+                if (curEnv.get(lhs) == null)
+                        {if (true) throw new ParseException("Undifine: "+ lhs);}
         break;
       case 48:
         jj_consume_token(48);
@@ -2381,143 +2401,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     finally { jj_save(6, xla); }
   }
 
-  private boolean jj_3_6() {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_scan_token(IF)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_74() {
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_scan_token(49)) return true;
-    if (jj_3R_61()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_70() {
-    if (jj_3R_72()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_36() {
-    if (jj_3R_38()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_39()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_73() {
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(49)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_71() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_73()) {
-    jj_scanpos = xsp;
-    if (jj_3R_74()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_48()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_49()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_75() {
-    if (jj_3R_28()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_76()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_57() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(67)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(68)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(69)) return true;
-    }
-    }
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_72() {
-    if (jj_scan_token(48)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_75()) jj_scanpos = xsp;
-    if (jj_scan_token(49)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_35() {
-    if (jj_3R_36()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_69() {
-    if (jj_scan_token(48)) return true;
-    if (jj_3R_71()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_47() {
-    if (jj_scan_token(56)) return true;
-    if (jj_3R_46()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(23)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(17)) return true;
-    }
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_68() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_70()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_54() {
-    if (jj_3R_56()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_57()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
   private boolean jj_3R_67() {
     if (jj_scan_token(INTEGER_LITERAL)) return true;
     return false;
@@ -2554,6 +2437,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   private boolean jj_3_4() {
     if (jj_3R_22()) return true;
     if (jj_scan_token(47)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(23)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(17)) return true;
+    }
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(48)) return true;
     return false;
   }
 
@@ -2613,11 +2508,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       xsp = jj_scanpos;
       if (jj_3R_55()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_20()) return true;
     return false;
   }
 
@@ -2703,11 +2593,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_26() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
   private boolean jj_3R_40() {
     if (jj_3R_42()) return true;
     Token xsp;
@@ -2718,23 +2603,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_30() {
-    if (jj_scan_token(43)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_29()) {
-    jj_scanpos = xsp;
-    if (jj_3R_30()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
+  private boolean jj_3R_24() {
+    if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
@@ -2749,21 +2619,21 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_24() {
-    if (jj_scan_token(IDENTIFIER)) return true;
+  private boolean jj_3R_34() {
+    if (jj_scan_token(43)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(44)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_20()) return true;
     return false;
   }
 
   private boolean jj_3R_41() {
     if (jj_scan_token(53)) return true;
     if (jj_3R_40()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_34() {
-    if (jj_scan_token(43)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(44)) return true;
     return false;
   }
 
@@ -2784,17 +2654,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_22() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(70)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(71)) return true;
-    }
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
   private boolean jj_3R_31() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2811,8 +2670,14 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_19()) return true;
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(70)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(71)) return true;
+    }
+    if (jj_3R_27()) return true;
     return false;
   }
 
@@ -2836,22 +2701,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_20() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(18)) jj_scanpos = xsp;
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_3R_24()) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_26()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(47)) return true;
-    return false;
-  }
-
   private boolean jj_3R_60() {
     if (jj_scan_token(66)) return true;
     if (jj_3R_56()) return true;
@@ -2872,6 +2721,19 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+  private boolean jj_3R_26() {
+    if (jj_scan_token(42)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_31()) jj_scanpos = xsp;
+    return false;
+  }
+
   private boolean jj_3R_59() {
     if (jj_scan_token(65)) return true;
     if (jj_3R_56()) return true;
@@ -2884,11 +2746,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_27() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_31()) jj_scanpos = xsp;
+  private boolean jj_3R_30() {
+    if (jj_scan_token(43)) return true;
     return false;
   }
 
@@ -2900,6 +2759,21 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     if (jj_scan_token(58)) return true;
     }
     if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_29() {
+    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
     return false;
   }
 
@@ -2917,6 +2791,152 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     jj_scanpos = xsp;
     if (jj_3R_60()) return true;
     }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_74() {
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_scan_token(49)) return true;
+    if (jj_3R_61()) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_73() {
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(49)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_71() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_73()) {
+    jj_scanpos = xsp;
+    if (jj_3R_74()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_70() {
+    if (jj_3R_72()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_36() {
+    if (jj_3R_38()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_39()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_75() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_76()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_3R_48()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_49()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_72() {
+    if (jj_scan_token(48)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_75()) jj_scanpos = xsp;
+    if (jj_scan_token(49)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_57() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(67)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(68)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(69)) return true;
+    }
+    }
+    if (jj_3R_56()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(18)) jj_scanpos = xsp;
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_3R_24()) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(47)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_69() {
+    if (jj_scan_token(48)) return true;
+    if (jj_3R_71()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_35() {
+    if (jj_3R_36()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_37()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_47() {
+    if (jj_scan_token(56)) return true;
+    if (jj_3R_46()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_68() {
+    if (jj_3R_27()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_70()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_54() {
+    if (jj_3R_56()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_57()) { jj_scanpos = xsp; break; }
     }
     return false;
   }

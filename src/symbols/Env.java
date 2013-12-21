@@ -7,7 +7,26 @@ import Parser.Token;
 public class Env {
 
 	private Hashtable table;
+	private int breakLabel;
+	private int continueLabel;
+	
 	protected Env prev;
+
+	public int getBreakLabel() {
+		return breakLabel;
+	}
+
+	public void setBreakLabel(int breakLabel) {
+		this.breakLabel = breakLabel;
+	}
+
+	public int getContinueLabel() {
+		return continueLabel;
+	}
+
+	public void setContinueLabel(int continueLabel) {
+		this.continueLabel = continueLabel;
+	}
 
 	public Env(Env n) { table = new Hashtable(); prev = n; }
 

@@ -200,7 +200,11 @@ void UniversalDeclarator() :
 		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
 	(
-		"," MyID()
+		"," id = MyID()
+		{
+			if (curEnv.contains(id))
+				throw new ParseException("Redifine: "+ id);
+			curEnv.put(id, t.image);		}
 		(
 		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
 		|
@@ -211,19 +215,28 @@ void UniversalDeclarator() :
 }
 
 /** struct declaration. */
-void StructDeclaration() : {}
+void StructDeclaration() : 
 {
-	"struct" MyID() StructBody()
+	Token t = null;
+	String id;
+}
+{
+	t = "struct" id = MyID()
+	{
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);	}
+	StructBody()
 }
 
 /** struct body. */
-void StructBody() :{}
+void StructBody() :
+{
+	Env savedEnv = curEnv;
+	curEnv = new Env(curEnv);
+}
 {
 	"{"
-	{
-		Env savedEnv = curEnv;
-		curEnv = new Env(curEnv);	}
-	
 	StructDeclarations()	
 	"}"
 	
@@ -255,8 +268,15 @@ void FunctionDeclarator() :
 	{		jjtThis.setType(t.image);
 		jjtThis.setName(id);
 		jjtThis.genInter();
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 	}
 	"(" (FunctionParameterList())? ")" FunctionBody()
+	{
+		curEnv = savedEnv;	}
 }
 
 /** function parameter list. */
@@ -277,6 +297,10 @@ void FunctionParameter() :
 		jjtThis.setType(t.image);
 		jjtThis.setName(id);
 		jjtThis.genInter();
+		
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);
 	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
@@ -728,6 +752,8 @@ int Primary() :
 	{
 		jjtThis.setName(lhs);
 		return jjtThis.genInter();
+		if (curEnv.get(lhs) == null)
+			throw new ParseException("Undifine: "+ lhs);
 	}
 	| "(" Primary2()
 }
