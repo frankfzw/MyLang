@@ -26,7 +26,7 @@ public class ASTPrimary extends SimpleNode {
    */
   public String toString() {
 	  if (name != null)
-		  return "Literal: " + name;
+		  return "Primary Literal: " + name;
 	return "Primary";
   }
   

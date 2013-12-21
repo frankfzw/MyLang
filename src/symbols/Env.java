@@ -30,12 +30,12 @@ public class Env {
 
 	public Env(Env n) { table = new Hashtable(); prev = n; }
 
-	public void put(String id, String type) { table.put(id, type); }
+	public void put(String id, Type type) { table.put(id, type); }
 
-	public String get(String id) {
+	public Type get(String id) {
 		for( Env e = this; e != null; e = e.prev ) 
 		{
-			String found = (String)(e.table.get(id));
+			Type found = (Type)(e.table.get(id));
 			if( found != null ) 
 				return found;			
 		}

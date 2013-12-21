@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import symbols.Type;
+
 public class SimpleNode implements Node {
 
   protected Node parent;
@@ -18,6 +20,7 @@ public class SimpleNode implements Node {
   protected static int breakLabel;
   protected static int continueLabel;
   
+  public static Type typeRight;
 
   public SimpleNode(int i) {
     id = i;
