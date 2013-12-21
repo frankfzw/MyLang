@@ -31,7 +31,7 @@ public class ASTAssignmentExpression extends SimpleNode {
 	public int genInter(int paraL, int paraR) throws IOException {
 		content = "\n" 
 				+ leftSide +" "
-				+ op + " t"
+				+ op + " @t"
 				+ Integer.toString(paraR);
 		writeInter();
 		return para;

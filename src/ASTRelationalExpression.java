@@ -38,18 +38,18 @@ public class ASTRelationalExpression extends SimpleNode {
 	}
 	
 	public int genInter(int paraL, int paraR) throws IOException {
-		content = "\nif t"
+		content = "\nif @t"
 				+ Integer.toString(paraL)
 				+ " " + op
-				+ " t" + Integer.toString(paraR)
+				+ " @t" + Integer.toString(paraR)
 				+ " goto L" + Integer.toString(genLabel());
-		content += "\nt" + Integer.toString(genPara())
+		content += "\n@t" + Integer.toString(genPara())
 				+ " = 0\n"
 				+ "goto L"
 				+ Integer.toString(genLabel())
 				+ "\nL"
 				+ Integer.toString(genOldLabel())
-				+ ":\nt" + Integer.toString(para)
+				+ ":\n@t" + Integer.toString(para)
 				+ " = 1\nL" + Integer.toString(genOldLabel())
 				+ ":";
 		writeInter();
