@@ -36,8 +36,12 @@ interface Node {
 //generate label
   public int genLabel();
   public int genOldLabel();
+  
   //generate paralabel
   public int genPara();
+  
+  //return para
+  public int getPara();
   
   //write intermediate code
   public void writeInter() throws IOException;

@@ -345,9 +345,19 @@ void EmptyStatement() : {}
 
 
 /** if statement. */
-void IfStatement() : {}
+void IfStatement() :
 {
-	<IF > "(" Expression() ")" Block() (LOOKAHEAD(2) <ELSE > <IF > "(" Expression() ")" Block())* (<ELSE > Block())?
+	int paraR;
+}
+{
+	<IF > "(" paraR = Expression() ")"
+	{
+		jjtThis.genInter(0, paraR);	}
+	Block()
+	{
+	 	jjtThis.genTailLabel();	}
+	(LOOKAHEAD(2) <ELSE > <IF > "(" Expression() ")" Block())* (<ELSE > Block())?
+	
 }
 
 /** A WhileStatement. */
@@ -396,143 +406,240 @@ void CommentStatement() : {}
 /** ************Expressions*************** .*/
 
 /** An Expression. */
-void Expression() : {}
+int Expression() :{}
 {
 	LOOKAHEAD(5)
 	AssignmentExpression()
+	{
+		return jjtThis.getPara();
+	}
 	| ConditionalExpression()
+	{
+		return jjtThis.getPara();	}
 }
 
 /** assignment expression. */
-void AssignmentExpression() :
+int AssignmentExpression() :
 {
 	String lhs;
 	Token op = null;
-	
+	int paraR;
 }
 {
-	lhs = LeftSide() (op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) Expression()
+	lhs = LeftSide() (op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()
 	{
 		jjtThis.setLeftSide(lhs);
 		jjtThis.setOp(op.image);
-		jjtThis.genInter(0, paraR);
+		return jjtThis.genInter(0, paraR);
 	}
 }
 
 /** conditional expression. */
-void ConditionalExpression() : {}
+int ConditionalExpression() : {}
 {
 	ConditionalOrExpression() ("?" Expression() ":" Expression())?
+	{
+		return jjtThis.getPara();	}
 }
 
 /** conditional or expression. */
-void ConditionalOrExpression() : {}
+int ConditionalOrExpression() :
 {
-	ConditionalAndExpression() ("||" ConditionalAndExpression())*
+	int paraL, paraR;
+}
+{
+	paraL = ConditionalAndExpression()
+	(
+		"||" paraR = ConditionalAndExpression()
+		{			paraL = jjtThis.genInter(paraL, paraR);		}
+	)*
+	{
+		return paraL;	}
 }
 
 /** conditional and expression. */
-void ConditionalAndExpression() : {}
+int ConditionalAndExpression() :
 {
-	InclusiveOrExpression() ("&&" InclusiveOrExpression())*
+	int paraL, paraR;
+}
+{
+	paraL = InclusiveOrExpression()
+	(
+		"&&" paraR = InclusiveOrExpression()
+		{
+			paraL =  jjtThis.genInter(paraL, paraR);		}
+	)*
+	{
+		return paraL;	}
 }
 
 /** inclusive or expression. */
-void InclusiveOrExpression() : {}
+int InclusiveOrExpression() : 
 {
-	ExclusiveOrExpression() ("|" ExclusiveOrExpression())*
+	int paraL, paraR;
+}
+{
+	paraL = ExclusiveOrExpression()
+	(
+		"|" paraR = ExclusiveOrExpression()
+		{
+			paraL =  jjtThis.genInter(paraL, paraR);
+		}
+	)*
+	{
+		return paraL;	}
 }
 
 /** exclusive or expression. */
-void ExclusiveOrExpression() : {}
+int ExclusiveOrExpression() :
 {
-	AndExpression() ("^" AndExpression())*
+	int paraL, paraR;
+}
+{
+	paraL = AndExpression()
+	(
+		"^" paraR = AndExpression()
+		{
+			paraL =  jjtThis.genInter(paraL, paraR);
+		}
+	)*
+	{
+		return paraL;	}
 }
 
 /** and expression. */
-void AndExpression() : {}
+int AndExpression() :
 {
-	EqualityExpression() ("&" EqualityExpression())*
+	int paraL, paraR;
+}
+{
+	paraL = EqualityExpression()
+	(
+		"&" paraR = EqualityExpression()
+		{
+			paraL =  jjtThis.genInter(paraL, paraR);
+		}
+	)*
+	{
+		return paraL;	}
 }
 
+
 /** equality expression. */
-void EqualityExpression() : {}
+int EqualityExpression() : 
 {
-	RelationalExpression() (("==" | "!=") RelationalExpression())*
+	int paraL, paraR;
+	Token op = null;
+}
+{
+	paraL = RelationalExpression()
+	(
+		(op = "==" | op = "!=") paraR = RelationalExpression()
+		{
+			jjtThis.setOp(op.image);
+			paraL =  jjtThis.genInter(paraL, paraR);
+		}
+	)*
+	{
+		return paraL;	}
 }
 
 /** relational expression. */
-void RelationalExpression() :
+int RelationalExpression() :
 {
 	Token op = null;
+	int paraL, paraR;
 }
 {
-	ShiftExpression()
+	paraL = ShiftExpression()
 	(
-		(op = "<"| op = ">" | op = "<=" | op = ">=") ShiftExpression()
+		(op = "<"| op = ">" | op = "<=" | op = ">=") paraR = ShiftExpression()
 		{
 			jjtThis.setOp(op.image);
-			jjtThis.genInter(paraL, paraR);
+			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
+	{
+		return paraL;	}
 }
 
 /** shift expression. */
-void ShiftExpression() :
+int ShiftExpression() :
 {
 	Token op = null;
+	int paraL, paraR;
 }
 {
-	AdditiveExpression()
+	paraL = AdditiveExpression()
 	(
-		(op = "<<" | op = ">>") AdditiveExpression()
+		(op = "<<" | op = ">>") paraR = AdditiveExpression()
 		{
 			jjtThis.setOp(op.image);
-			jjtThis.genInter(paraL, paraR);
+			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
+	{
+		return paraL;	}
 }
 
 /** additive expression. */
-void AdditiveExpression() :
+int AdditiveExpression() :
 {
 	Token op = null;
+	int paraL, paraR;
 }
 {
-	MultiplicativeExpression()
+	paraL = MultiplicativeExpression()
 	(
-		(op = "+" | op = "-") MultiplicativeExpression()
+		(op = "+" | op = "-") paraR = MultiplicativeExpression()
 		{
 			jjtThis.setOp(op.image);
-			jjtThis.genInter(paraL, paraR);
+			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
+	{
+		return paraL;	}
 }
 
 /** multiplicative expression. */
-void MultiplicativeExpression() :
+int MultiplicativeExpression() :
 {
 	Token op = null;
+	int paraL, paraR;
 }
 {
-	UnaryExpression()
+	paraL = UnaryExpression()
 	(
-		(op = "*" | op = "/" | op = "%") UnaryExpression()
+		(op = "*" | op = "/" | op = "%") paraR = UnaryExpression()
 		{
 			jjtThis.setOp(op.image);
-			jjtThis.genInter(paraL, paraR);
+			paraL = jjtThis.genInter(paraL, paraR);
 		}
 	)*
+	{
+		return paraL;	}
 	
 }
 
 
 /** unary expression. */
-void UnaryExpression() : {}
+int UnaryExpression() : 
+{
+	Token op = null;
+	int paraR;
+}
 {
 	SimpleUnaryExpression()
-	| "+" UnaryExpression()
-	| "-" UnaryExpression()
+	{
+		return jjtThis.getPara();	}
+	| op = "+" paraR = UnaryExpression()
+	{
+		jjtThis.setOp(op.image);
+		return jjtThis.genInter(0, paraR);	}
+	| op = "-" paraR = UnaryExpression()
+	{
+		jjtThis.setOp(op.image);
+		return jjtThis.genInter(0, paraR);	}
 }
 
 /** PreIncDecExpression. */
@@ -550,32 +657,51 @@ void PostIncDecExpression() : {}
 
 
 /** unary expression not plus minus(simpleUnaryExpression). */
-void SimpleUnaryExpression() : {}
+int SimpleUnaryExpression() : 
+{
+	Token op = null;
+	int paraR;
+}
 {
 	Primary()
-	| "~" UnaryExpression()
-	| "!" UnaryExpression()
+	{
+		return jjtThis.getPara();
+	}
+	| op = "~" paraR = UnaryExpression()
+	{
+		jjtThis.setOp(op.image);
+		return jjtThis.genInter(0, paraR);
+	}
+	| op = "!" paraR = UnaryExpression()
+	{
+		jjtThis.setOp(op.image);
+		return jjtThis.genInter(0, paraR);
+	}
 }
 
 
 /** primary. */
-void Primary() :
+int Primary() :
 {
 	Token t1;
+	String lhs;
 }
 {
 	t1 = <LITERAL >
 	{
 		jjtThis.setName(t1.image);
-		jjtThis.genInter();
+		return jjtThis.genInter();
 	}
 	| t1 = <INTEGER_LITERAL >
 	{
 		jjtThis.setName(t1.image);
-		String temp1 = jjtThis.genInter();
-		jjtThis.writeInter(temp1);
+		return jjtThis.genInter();
 	}
-	| LeftSide() (FunctionInvoke())?
+	| lhs = LeftSide() (FunctionInvoke())?
+	{
+		jjtThis.setName(lhs);
+		return jjtThis.genInter();
+	}
 	| "(" Primary2()
 }
 

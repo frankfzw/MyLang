@@ -117,6 +117,12 @@ public class SimpleNode implements Node {
 			return ++ oldLabel;
 		return -1;
 	}
+
+	@Override
+	public int getPara() {
+		// TODO Auto-generated method stub
+		return para;
+	}
   
   
 

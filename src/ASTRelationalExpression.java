@@ -42,16 +42,16 @@ public class ASTRelationalExpression extends SimpleNode {
 				+ Integer.toString(paraL)
 				+ " " + op
 				+ " t" + Integer.toString(paraR)
-				+ " goto L" + Integer.toString(genLabel())
-				+ "\ngoto L" + Integer.toString(genLabel());
-		content += "\nL"
-				+ Integer.toString(genOldLabel())
-				+ ":\nt" + Integer.toString(genPara())
-				+ " = 1\n"
-				+ "L"
+				+ " goto L" + Integer.toString(genLabel());
+		content += "\nt" + Integer.toString(genPara())
+				+ " = 0\n"
+				+ "goto L"
+				+ Integer.toString(genLabel())
+				+ "\nL"
 				+ Integer.toString(genOldLabel())
 				+ ":\nt" + Integer.toString(para)
-				+ " = 0";
+				+ " = 1\nL" + Integer.toString(genOldLabel())
+				+ ":";
 		writeInter();
 		return para;
 	}

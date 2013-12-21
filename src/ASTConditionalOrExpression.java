@@ -20,16 +20,23 @@ class ASTConditionalOrExpression extends SimpleNode {
 	  content = "\nif t"
 				+ Integer.toString(paraL)
 				+ " == 0 " 
-				+ " t" + Integer.toString(paraR)
 				+ " goto L" + Integer.toString(genLabel())
 				+ "\ngoto L" + Integer.toString(genLabel());
 	  content += "\nL"
 				+ Integer.toString(genOldLabel())
 				+ ":\nif t"
-				+ Integer.toString(paraL)
+				+ Integer.toString(paraR)
 				+ " == 0 " 
-				+ " t" + Integer.toString(paraR)
-				+ " goto L" + Integer.toString(genLabel());
+				+ " goto L" + Integer.toString(genLabel())
+				+ "\nL" + Integer.toString(genOldLabel())
+				+ ":"
+				+ "\nt" + Integer.toString(genPara())
+				+ " = 1"
+				+ "\ngoto L" + Integer.toString(genLabel())
+				+ "\nL" + Integer.toString(genOldLabel()) + ":"
+				+ "\nt" + Integer.toString(para)
+				+ " = 0"
+				+ "\nL" + Integer.toString(genOldLabel()) + ":";
 	  writeInter();
 	  return para;
   }
