@@ -427,8 +427,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       id = MyID();
                 jjtn000.setType(t.image);
                 jjtn000.setName(id);
-                String temp = jjtn000.genInter();
-                jjtn000.writeInter(temp);
+                jjtn000.genInter();
       jj_consume_token(48);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VARIABLE_TYPE:
@@ -524,8 +523,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       id = MyID();
                 jjtn000.setType(t.image);
                 jjtn000.setName(id);
-                String temp = jjtn000.genInter();
-                jjtn000.writeInter(temp);
+                jjtn000.genInter();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_EQUAL_OPERATOR:
       case 43:
@@ -909,16 +907,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
 /** if statement. */
   final public void IfStatement() throws ParseException {
-                      /*@bgen(jjtree) IfStatement */
-  ASTIfStatement jjtn000 = new ASTIfStatement(JJTIFSTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+ /*@bgen(jjtree) IfStatement */
+        ASTIfStatement jjtn000 = new ASTIfStatement(JJTIFSTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraR;
     try {
       jj_consume_token(IF);
       jj_consume_token(48);
-      Expression();
+      paraR = Expression();
       jj_consume_token(49);
+                jjtn000.genInter(0, paraR);
       Block();
+                jjtn000.genTailLabel();
       label_7:
       while (true) {
         if (jj_2_6(2)) {
@@ -1172,14 +1172,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 /** ************Expressions*************** .*/
 
 /** An Expression. */
-  final public void Expression() throws ParseException {
-                     /*@bgen(jjtree) Expression */
+  final public int Expression() throws ParseException {
+                   /*@bgen(jjtree) Expression */
   ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
       if (jj_2_7(5)) {
         AssignmentExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return jjtn000.getPara();}
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case INTEGER_LITERAL:
@@ -1191,6 +1194,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         case 72:
         case 73:
           ConditionalExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return jjtn000.getPara();}
           break;
         default:
           jj_la1[31] = jj_gen;
@@ -1217,15 +1223,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** assignment expression. */
-  final public void AssignmentExpression() throws ParseException {
+  final public int AssignmentExpression() throws ParseException {
  /*@bgen(jjtree) AssignmentExpression */
         ASTAssignmentExpression jjtn000 = new ASTAssignmentExpression(JJTASSIGNMENTEXPRESSION);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);String lhs;
         Token op = null;
+        int paraR;
     try {
       lhs = LeftSide();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1240,13 +1248,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         jj_consume_token(-1);
         throw new ParseException();
       }
-      Expression();
+      paraR = Expression();
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 jjtn000.setLeftSide(lhs);
                 jjtn000.setOp(op.image);
-                String temp = jjtn000.genInter();
-                jjtn000.writeInter(temp);
+                {if (true) return jjtn000.genInter(0, paraR);}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1266,11 +1273,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** conditional expression. */
-  final public void ConditionalExpression() throws ParseException {
-                                /*@bgen(jjtree) ConditionalExpression */
+  final public int ConditionalExpression() throws ParseException {
+                               /*@bgen(jjtree) ConditionalExpression */
   ASTConditionalExpression jjtn000 = new ASTConditionalExpression(JJTCONDITIONALEXPRESSION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
@@ -1287,6 +1295,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         jj_la1[33] = jj_gen;
         ;
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return jjtn000.getPara();}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1306,16 +1317,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** conditional or expression. */
-  final public void ConditionalOrExpression() throws ParseException {
-                                  /*@bgen(jjtree) ConditionalOrExpression */
-  ASTConditionalOrExpression jjtn000 = new ASTConditionalOrExpression(JJTCONDITIONALOREXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int ConditionalOrExpression() throws ParseException {
+ /*@bgen(jjtree) ConditionalOrExpression */
+        ASTConditionalOrExpression jjtn000 = new ASTConditionalOrExpression(JJTCONDITIONALOREXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
     try {
-      ConditionalAndExpression();
+      paraL = ConditionalAndExpression();
       label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1327,8 +1339,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_8;
         }
         jj_consume_token(52);
-        ConditionalAndExpression();
+        paraR = ConditionalAndExpression();
+                        paraL = jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1348,16 +1364,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** conditional and expression. */
-  final public void ConditionalAndExpression() throws ParseException {
-                                   /*@bgen(jjtree) ConditionalAndExpression */
-  ASTConditionalAndExpression jjtn000 = new ASTConditionalAndExpression(JJTCONDITIONALANDEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int ConditionalAndExpression() throws ParseException {
+ /*@bgen(jjtree) ConditionalAndExpression */
+        ASTConditionalAndExpression jjtn000 = new ASTConditionalAndExpression(JJTCONDITIONALANDEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
     try {
-      InclusiveOrExpression();
+      paraL = InclusiveOrExpression();
       label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1369,8 +1386,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_9;
         }
         jj_consume_token(53);
-        InclusiveOrExpression();
+        paraR = InclusiveOrExpression();
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1390,16 +1411,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** inclusive or expression. */
-  final public void InclusiveOrExpression() throws ParseException {
-                                /*@bgen(jjtree) InclusiveOrExpression */
-  ASTInclusiveOrExpression jjtn000 = new ASTInclusiveOrExpression(JJTINCLUSIVEOREXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int InclusiveOrExpression() throws ParseException {
+ /*@bgen(jjtree) InclusiveOrExpression */
+        ASTInclusiveOrExpression jjtn000 = new ASTInclusiveOrExpression(JJTINCLUSIVEOREXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
     try {
-      ExclusiveOrExpression();
+      paraL = ExclusiveOrExpression();
       label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1411,8 +1433,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_10;
         }
         jj_consume_token(54);
-        ExclusiveOrExpression();
+        paraR = ExclusiveOrExpression();
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1432,16 +1458,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** exclusive or expression. */
-  final public void ExclusiveOrExpression() throws ParseException {
-                                /*@bgen(jjtree) ExclusiveOrExpression */
-  ASTExclusiveOrExpression jjtn000 = new ASTExclusiveOrExpression(JJTEXCLUSIVEOREXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int ExclusiveOrExpression() throws ParseException {
+ /*@bgen(jjtree) ExclusiveOrExpression */
+        ASTExclusiveOrExpression jjtn000 = new ASTExclusiveOrExpression(JJTEXCLUSIVEOREXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
     try {
-      AndExpression();
+      paraL = AndExpression();
       label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1453,8 +1480,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_11;
         }
         jj_consume_token(55);
-        AndExpression();
+        paraR = AndExpression();
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1474,16 +1505,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** and expression. */
-  final public void AndExpression() throws ParseException {
-                        /*@bgen(jjtree) AndExpression */
-  ASTAndExpression jjtn000 = new ASTAndExpression(JJTANDEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int AndExpression() throws ParseException {
+ /*@bgen(jjtree) AndExpression */
+        ASTAndExpression jjtn000 = new ASTAndExpression(JJTANDEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
     try {
-      EqualityExpression();
+      paraL = EqualityExpression();
       label_12:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1495,8 +1527,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_12;
         }
         jj_consume_token(56);
-        EqualityExpression();
+        paraR = EqualityExpression();
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1516,16 +1552,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** equality expression. */
-  final public void EqualityExpression() throws ParseException {
-                             /*@bgen(jjtree) EqualityExpression */
-  ASTEqualityExpression jjtn000 = new ASTEqualityExpression(JJTEQUALITYEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int EqualityExpression() throws ParseException {
+ /*@bgen(jjtree) EqualityExpression */
+        ASTEqualityExpression jjtn000 = new ASTEqualityExpression(JJTEQUALITYEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraL, paraR;
+        Token op = null;
     try {
-      RelationalExpression();
+      paraL = RelationalExpression();
       label_13:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1539,18 +1577,23 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 57:
-          jj_consume_token(57);
+          op = jj_consume_token(57);
           break;
         case 58:
-          jj_consume_token(58);
+          op = jj_consume_token(58);
           break;
         default:
           jj_la1[40] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-        RelationalExpression();
+        paraR = RelationalExpression();
+                        jjtn000.setOp(op.image);
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1570,16 +1613,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** relational expression. */
-  final public void RelationalExpression() throws ParseException {
+  final public int RelationalExpression() throws ParseException {
  /*@bgen(jjtree) RelationalExpression */
         ASTRelationalExpression jjtn000 = new ASTRelationalExpression(JJTRELATIONALEXPRESSION);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraL, paraR;
     try {
-      ShiftExpression();
+      paraL = ShiftExpression();
       label_14:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1611,11 +1656,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_consume_token(-1);
           throw new ParseException();
         }
-        ShiftExpression();
+        paraR = ShiftExpression();
                         jjtn000.setOp(op.image);
-                        String temp = jjtn000.genInter();
-                        jjtn000.writeInter(temp);
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1635,16 +1682,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** shift expression. */
-  final public void ShiftExpression() throws ParseException {
+  final public int ShiftExpression() throws ParseException {
  /*@bgen(jjtree) ShiftExpression */
         ASTShiftExpression jjtn000 = new ASTShiftExpression(JJTSHIFTEXPRESSION);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraL, paraR;
     try {
-      AdditiveExpression();
+      paraL = AdditiveExpression();
       label_15:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1668,11 +1717,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_consume_token(-1);
           throw new ParseException();
         }
-        AdditiveExpression();
+        paraR = AdditiveExpression();
                         jjtn000.setOp(op.image);
-                        String temp = jjtn000.genInter();
-                        jjtn000.writeInter(temp);
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1692,16 +1743,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** additive expression. */
-  final public void AdditiveExpression() throws ParseException {
+  final public int AdditiveExpression() throws ParseException {
  /*@bgen(jjtree) AdditiveExpression */
         ASTAdditiveExpression jjtn000 = new ASTAdditiveExpression(JJTADDITIVEEXPRESSION);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraL, paraR;
     try {
-      MultiplicativeExpression();
+      paraL = MultiplicativeExpression();
       label_16:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1725,11 +1778,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_consume_token(-1);
           throw new ParseException();
         }
-        MultiplicativeExpression();
+        paraR = MultiplicativeExpression();
                         jjtn000.setOp(op.image);
-                        String temp = jjtn000.genInter();
-                        jjtn000.writeInter(temp);
+                        paraL =  jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1749,16 +1804,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** multiplicative expression. */
-  final public void MultiplicativeExpression() throws ParseException {
+  final public int MultiplicativeExpression() throws ParseException {
  /*@bgen(jjtree) MultiplicativeExpression */
         ASTMultiplicativeExpression jjtn000 = new ASTMultiplicativeExpression(JJTMULTIPLICATIVEEXPRESSION);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraL, paraR;
     try {
-      UnaryExpression();
+      paraL = UnaryExpression();
       label_17:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1786,11 +1843,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_consume_token(-1);
           throw new ParseException();
         }
-        UnaryExpression();
+        paraR = UnaryExpression();
                         jjtn000.setOp(op.image);
-                        String temp = jjtn000.genInter();
-                        jjtn000.writeInter(temp);
+                        paraL = jjtn000.genInter(paraL, paraR);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraL;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1810,14 +1869,16 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** unary expression. */
-  final public void UnaryExpression() throws ParseException {
-                          /*@bgen(jjtree) UnaryExpression */
-  ASTUnaryExpression jjtn000 = new ASTUnaryExpression(JJTUNARYEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int UnaryExpression() throws ParseException {
+ /*@bgen(jjtree) UnaryExpression */
+        ASTUnaryExpression jjtn000 = new ASTUnaryExpression(JJTUNARYEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INTEGER_LITERAL:
@@ -1827,14 +1888,25 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case 72:
       case 73:
         SimpleUnaryExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return jjtn000.getPara();}
         break;
       case 65:
-        jj_consume_token(65);
-        UnaryExpression();
+        op = jj_consume_token(65);
+        paraR = UnaryExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.setOp(op.image);
+                {if (true) return jjtn000.genInter(0, paraR);}
         break;
       case 66:
-        jj_consume_token(66);
-        UnaryExpression();
+        op = jj_consume_token(66);
+        paraR = UnaryExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.setOp(op.image);
+                {if (true) return jjtn000.genInter(0, paraR);}
         break;
       default:
         jj_la1[49] = jj_gen;
@@ -1860,6 +1932,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** PreIncDecExpression. */
@@ -1945,11 +2018,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   }
 
 /** unary expression not plus minus(simpleUnaryExpression). */
-  final public void SimpleUnaryExpression() throws ParseException {
-                                /*@bgen(jjtree) SimpleUnaryExpression */
-  ASTSimpleUnaryExpression jjtn000 = new ASTSimpleUnaryExpression(JJTSIMPLEUNARYEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int SimpleUnaryExpression() throws ParseException {
+ /*@bgen(jjtree) SimpleUnaryExpression */
+        ASTSimpleUnaryExpression jjtn000 = new ASTSimpleUnaryExpression(JJTSIMPLEUNARYEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);Token op = null;
+        int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INTEGER_LITERAL:
@@ -1957,14 +2031,25 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case IDENTIFIER:
       case 48:
         Primary();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return jjtn000.getPara();}
         break;
       case 72:
-        jj_consume_token(72);
-        UnaryExpression();
+        op = jj_consume_token(72);
+        paraR = UnaryExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.setOp(op.image);
+                {if (true) return jjtn000.genInter(0, paraR);}
         break;
       case 73:
-        jj_consume_token(73);
-        UnaryExpression();
+        op = jj_consume_token(73);
+        paraR = UnaryExpression();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.setOp(op.image);
+                {if (true) return jjtn000.genInter(0, paraR);}
         break;
       default:
         jj_la1[52] = jj_gen;
@@ -1990,14 +2075,16 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** primary. */
-  final public void Primary() throws ParseException {
+  final public int Primary() throws ParseException {
  /*@bgen(jjtree) Primary */
         ASTPrimary jjtn000 = new ASTPrimary(JJTPRIMARY);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t1;
+        String lhs;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LITERAL:
@@ -2005,19 +2092,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 jjtn000.setName(t1.image);
-                String temp = jjtn000.genInter();
-                jjtn000.writeInter(temp);
+                {if (true) return jjtn000.genInter();}
         break;
       case INTEGER_LITERAL:
         t1 = jj_consume_token(INTEGER_LITERAL);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 jjtn000.setName(t1.image);
-                String temp1 = jjtn000.genInter();
-                jjtn000.writeInter(temp1);
+                {if (true) return jjtn000.genInter();}
         break;
       case IDENTIFIER:
-        LeftSide();
+        lhs = LeftSide();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 48:
           FunctionInvoke();
@@ -2026,6 +2111,10 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_la1[53] = jj_gen;
           ;
         }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.setName(lhs);
+                {if (true) return jjtn000.genInter();}
         break;
       case 48:
         jj_consume_token(48);
@@ -2055,6 +2144,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** FunctionInvoke. */
@@ -2291,116 +2381,67 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     finally { jj_save(6, xla); }
   }
 
-  private boolean jj_3R_44() {
-    if (jj_3R_46()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_47()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3_6() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_scan_token(IF)) return true;
     return false;
   }
 
-  private boolean jj_3R_37() {
-    if (jj_scan_token(51)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(50)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(70)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(71)) return true;
-    }
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_3R_44()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_45()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_60() {
-    if (jj_scan_token(66)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_59() {
-    if (jj_scan_token(65)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_40() {
-    if (jj_3R_42()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_43()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_58() {
+  private boolean jj_3R_74() {
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_scan_token(49)) return true;
     if (jj_3R_61()) return true;
     return false;
   }
 
-  private boolean jj_3R_56() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_58()) {
-    jj_scanpos = xsp;
-    if (jj_3R_59()) {
-    jj_scanpos = xsp;
-    if (jj_3R_60()) return true;
-    }
-    }
+  private boolean jj_3R_70() {
+    if (jj_3R_72()) return true;
     return false;
   }
 
-  private boolean jj_3R_24() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(23)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(17)) return true;
-    }
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_38() {
-    if (jj_3R_40()) return true;
+  private boolean jj_3R_36() {
+    if (jj_3R_38()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_41()) { jj_scanpos = xsp; break; }
+      if (jj_3R_39()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3R_34() {
-    if (jj_scan_token(43)) return true;
+  private boolean jj_3R_73() {
     if (jj_3R_28()) return true;
-    if (jj_scan_token(44)) return true;
+    if (jj_scan_token(49)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_71() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_73()) {
+    jj_scanpos = xsp;
+    if (jj_3R_74()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_3R_48()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_49()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_75() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_76()) { jj_scanpos = xsp; break; }
+    }
     return false;
   }
 
@@ -2418,28 +2459,88 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_31() {
+  private boolean jj_3R_72() {
+    if (jj_scan_token(48)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_33()) {
+    if (jj_3R_75()) jj_scanpos = xsp;
+    if (jj_scan_token(49)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_35() {
+    if (jj_3R_36()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_37()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_69() {
+    if (jj_scan_token(48)) return true;
+    if (jj_3R_71()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_47() {
+    if (jj_scan_token(56)) return true;
+    if (jj_3R_46()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(23)) {
     jj_scanpos = xsp;
-    if (jj_3R_34()) return true;
+    if (jj_scan_token(17)) return true;
+    }
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(48)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_68() {
+    if (jj_3R_27()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_70()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_54() {
+    if (jj_3R_56()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_57()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3R_33() {
-    if (jj_scan_token(74)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
+  private boolean jj_3R_67() {
+    if (jj_scan_token(INTEGER_LITERAL)) return true;
     return false;
   }
 
-  private boolean jj_3R_36() {
-    if (jj_3R_38()) return true;
+  private boolean jj_3R_23() {
+    if (jj_3R_27()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(41)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(40)) return true;
+    }
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_44() {
+    if (jj_3R_46()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_39()) { jj_scanpos = xsp; break; }
+      if (jj_3R_47()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
@@ -2462,30 +2563,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_54() {
-    if (jj_3R_56()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_57()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_35() {
-    if (jj_3R_36()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_76() {
-    if (jj_scan_token(42)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
   private boolean jj_3R_55() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2494,213 +2571,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     if (jj_scan_token(66)) return true;
     }
     if (jj_3R_54()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_27() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_31()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(41)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(40)) return true;
-    }
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_74() {
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_scan_token(49)) return true;
-    if (jj_3R_61()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_52() {
-    if (jj_3R_54()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_55()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_73() {
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(49)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_71() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_73()) {
-    jj_scanpos = xsp;
-    if (jj_3R_74()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_70() {
-    if (jj_3R_72()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_75() {
-    if (jj_3R_28()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_76()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_32() {
-    if (jj_3R_35()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_53() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(63)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(64)) return true;
-    }
-    if (jj_3R_52()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_72() {
-    if (jj_scan_token(48)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_75()) jj_scanpos = xsp;
-    if (jj_scan_token(49)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_28() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_69() {
-    if (jj_scan_token(48)) return true;
-    if (jj_3R_71()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_68() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_70()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_50() {
-    if (jj_3R_52()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_53()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_30() {
-    if (jj_scan_token(43)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_49() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(57)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(58)) return true;
-    }
-    if (jj_3R_48()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_67() {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_29()) {
-    jj_scanpos = xsp;
-    if (jj_3R_30()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_51() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(59)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(60)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(61)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(62)) return true;
-    }
-    }
-    }
-    if (jj_3R_50()) return true;
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_scan_token(IF)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_47() {
-    if (jj_scan_token(56)) return true;
-    if (jj_3R_46()) return true;
     return false;
   }
 
@@ -2725,18 +2595,54 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_19()) return true;
+  private boolean jj_3R_45() {
+    if (jj_scan_token(55)) return true;
+    if (jj_3R_44()) return true;
     return false;
   }
 
-  private boolean jj_3R_48() {
-    if (jj_3R_50()) return true;
+  private boolean jj_3R_32() {
+    if (jj_3R_35()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_52() {
+    if (jj_3R_54()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_51()) { jj_scanpos = xsp; break; }
+      if (jj_3R_55()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_3R_44()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_45()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_32()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_3R_23()) return true;
     return false;
   }
 
@@ -2746,37 +2652,26 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_20() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(18)) jj_scanpos = xsp;
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_3R_24()) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_26()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(47)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_43() {
-    if (jj_scan_token(54)) return true;
-    if (jj_3R_42()) return true;
-    return false;
-  }
-
   private boolean jj_3R_63() {
     if (jj_scan_token(72)) return true;
     if (jj_3R_56()) return true;
     return false;
   }
 
-  private boolean jj_3R_45() {
-    if (jj_scan_token(55)) return true;
-    if (jj_3R_44()) return true;
+  private boolean jj_3R_53() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(63)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(64)) return true;
+    }
+    if (jj_3R_52()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43() {
+    if (jj_scan_token(54)) return true;
+    if (jj_3R_42()) return true;
     return false;
   }
 
@@ -2798,25 +2693,48 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_41() {
-    if (jj_scan_token(53)) return true;
-    if (jj_3R_40()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_48()) return true;
+  private boolean jj_3R_50() {
+    if (jj_3R_52()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_49()) { jj_scanpos = xsp; break; }
+      if (jj_3R_53()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3R_39() {
-    if (jj_scan_token(52)) return true;
-    if (jj_3R_38()) return true;
+  private boolean jj_3R_26() {
+    if (jj_scan_token(42)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_40() {
+    if (jj_3R_42()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_43()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_30() {
+    if (jj_scan_token(43)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_29() {
+    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
     return false;
   }
 
@@ -2827,6 +2745,178 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     if (jj_scan_token(70)) {
     jj_scanpos = xsp;
     if (jj_scan_token(71)) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41() {
+    if (jj_scan_token(53)) return true;
+    if (jj_3R_40()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_34() {
+    if (jj_scan_token(43)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(44)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_51() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(59)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(60)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(61)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(62)) return true;
+    }
+    }
+    }
+    if (jj_3R_50()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(70)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(71)) return true;
+    }
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_33()) {
+    jj_scanpos = xsp;
+    if (jj_3R_34()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_33() {
+    if (jj_scan_token(74)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_38() {
+    if (jj_3R_40()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_41()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_48() {
+    if (jj_3R_50()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_51()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(18)) jj_scanpos = xsp;
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_3R_24()) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(47)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_60() {
+    if (jj_scan_token(66)) return true;
+    if (jj_3R_56()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_37() {
+    if (jj_scan_token(51)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(50)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_76() {
+    if (jj_scan_token(42)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_59() {
+    if (jj_scan_token(65)) return true;
+    if (jj_3R_56()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_39() {
+    if (jj_scan_token(52)) return true;
+    if (jj_3R_38()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_31()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_49() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(57)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(58)) return true;
+    }
+    if (jj_3R_48()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_58() {
+    if (jj_3R_61()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_58()) {
+    jj_scanpos = xsp;
+    if (jj_3R_59()) {
+    jj_scanpos = xsp;
+    if (jj_3R_60()) return true;
+    }
     }
     return false;
   }
