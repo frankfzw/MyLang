@@ -267,7 +267,11 @@ void UniversalDeclarator() :
 		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
 	(
-		"," MyID()
+		"," id = MyID()
+		{
+			if (curEnv.contains(id))
+				throw new ParseException("Redifine: "+ id);
+			curEnv.put(id, t.image);		}
 		(
 		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
 		|
@@ -298,15 +302,24 @@ void UniversalDeclarator() :
 }
 
 /** struct declaration. */
-void StructDeclaration() : {/*@bgen(jjtree) StructDeclaration */
-  ASTStructDeclaration jjtn000 = new ASTStructDeclaration(JJTSTRUCTDECLARATION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+void StructDeclaration() : 
+{/*@bgen(jjtree) StructDeclaration */
+        ASTStructDeclaration jjtn000 = new ASTStructDeclaration(JJTSTRUCTDECLARATION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t = null;
+	String id;
+}
 {/*@bgen(jjtree) StructDeclaration */
         try {
 /*@egen*/
-	"struct" MyID() StructBody()/*@bgen(jjtree)*/
+	t = "struct" id = MyID()
+	{
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);	}
+	StructBody()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -330,19 +343,19 @@ void StructDeclaration() : {/*@bgen(jjtree) StructDeclaration */
 }
 
 /** struct body. */
-void StructBody() :{/*@bgen(jjtree) StructBody */
-  ASTStructBody jjtn000 = new ASTStructBody(JJTSTRUCTBODY);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+void StructBody() :
+{/*@bgen(jjtree) StructBody */
+        ASTStructBody jjtn000 = new ASTStructBody(JJTSTRUCTBODY);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Env savedEnv = curEnv;
+	curEnv = new Env(curEnv);
+}
 {/*@bgen(jjtree) StructBody */
         try {
 /*@egen*/
 	"{"
-	{
-		Env savedEnv = curEnv;
-		curEnv = new Env(curEnv);	}
-	
 	StructDeclarations()	
 	"}"/*@bgen(jjtree)*/
         {
@@ -457,8 +470,20 @@ void FunctionDeclarator() :
 	{		jjtn000.setType(t.image);
 		jjtn000.setName(id);
 		jjtn000.genInter();
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 	}
 	"(" (FunctionParameterList())? ")" FunctionBody()/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		curEnv = savedEnv;	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -531,6 +556,10 @@ void FunctionParameter() :
 		jjtn000.setType(t.image);
 		jjtn000.setName(id);
 		jjtn000.genInter();
+		
+		if (curEnv.contains(id))
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, t.image);
 	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
@@ -1872,6 +1901,8 @@ int Primary() :
 	{
 		jjtn000.setName(lhs);
 		return jjtn000.genInter();
+		if (curEnv.get(lhs) == null)
+			throw new ParseException("Undifine: "+ lhs);
 	}
 	| "(" Primary2()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
