@@ -1,5 +1,5 @@
-int ass;
-int a(int as, int a)
+int a()
 {
-	a = 'a';
+	bool a;
+	a  = 1;
 }

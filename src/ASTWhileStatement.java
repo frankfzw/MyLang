@@ -32,7 +32,7 @@ class ASTWhileStatement extends SimpleNode {
 	  writeInter();
 	  return para;
   }
-  
+ 
   public int writeTailLabel() throws IOException {
 	  content = "goto @L" + Integer.toString(headLabel)
 			  + "\n@L" + Integer.toString(tailLabel) + ": ";

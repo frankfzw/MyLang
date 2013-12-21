@@ -109,18 +109,14 @@ TOKEN : /* LITERAL  */
 		| <HEX_NUMERAL >
 		| <OCTAL_NUMERAL >
 	>
-	| <#REAL_LITERAL:
+	| <REAL_LITERAL:
 		(<DECIMAL_NUMERAL > "." <DECIMAL_NUMERAL >)
 		| ("." <DECIMAL_NUMERAL >)
 		| (<DECIMAL_NUMERAL > ".")
 	>
-	| <LITERAL:		
-		<INTEGER_LITERAL >
-		| <REAL_LITERAL >
-		| <BOOLEAN_LITERAL >
-		| <NULL_LITERAL >
-		| <CHARACTER_LITERAL >	
-	>
+	| <BOOLEAN_LITERAL: "true" | "false" >
+	| <NULL_LITERAL: "null" >
+	| <CHARACTER_LITERAL: ("\'" ["a"-"z", "A"-"Z", "1"-"9"] "\'") >
 	| <#NON_ZERO_DIGIT: ["1"-"9"] >
 	| <#DIGIT: "0" | <NON_ZERO_DIGIT > >
 	| <#DIGITS: (<DIGIT >)* >
@@ -131,10 +127,7 @@ TOKEN : /* LITERAL  */
 	| <#HEX_DIGIT: ["0"-"9", "a"-"f", "A"-"F"] >	
 	| <#HEX_NUMERAL: ("0" ["x", "X"] (<HEX_DIGIT >)+) >
 	| <#OCTAL_DIGIT: ["0"-"7"] >
-	| <#OCTAL_NUMERAL: ("0" (<OCTAL_DIGIT >)+) >
-	| <#BOOLEAN_LITERAL: "true" | "false" >
-	| <#NULL_LITERAL: "null" >
-	| <#CHARACTER_LITERAL: ("\'" ["a"-"z", "A"-"Z", "1"-"9"] "\'") >}
+	| <#OCTAL_NUMERAL: ("0" (<OCTAL_DIGIT >)+) >	}
 
 TOKEN : /* IDENTIFIERS */
 {
@@ -193,7 +186,17 @@ void UniversalDeclarator() :
 		jjtThis.setName(t.image);
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, t.image);	}	
+		String s = t.image;
+		if (s.compareTo("int") == 0)
+		   curEnv.put(id, Type.Int);
+		else if (s.compareTo("bool") == 0)
+			curEnv.put(id, Type.Bool);
+		else if (s.compareTo("real") == 0)
+			curEnv.put(id, Type.Real);
+		else if (s.compareTo("char") == 0)
+			curEnv.put(id, Type.Char);
+		
+	}	
 	(
 		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	|
@@ -204,7 +207,7 @@ void UniversalDeclarator() :
 		{
 			if (curEnv.contains(id))
 				throw new ParseException("Redifine: "+ id);
-			curEnv.put(id, t.image);		}
+			curEnv.put(id, new Type(t.image, false));		}
 		(
 		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
 		|
@@ -225,7 +228,7 @@ void StructDeclaration() :
 	{
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, t.image);	}
+		curEnv.put(id, new Type(t.image, true));	}
 	StructBody()
 }
 
@@ -265,12 +268,13 @@ void FunctionDeclarator() :
 {
 	(t = <VOID > | t = <VARIABLE_TYPE >)
 	id = MyID()
-	{		jjtThis.setType(t.image);
+	{
+		jjtThis.setType(t.image);
 		jjtThis.setName(id);
 		jjtThis.genInter();
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, t.image);
+		curEnv.put(id, new Type(t.image, true));
 		Env savedEnv = curEnv;
 		curEnv = new Env(curEnv);
 	}
@@ -304,7 +308,7 @@ void FunctionParameter() :
 		
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, t.image);
+		curEnv.put(id, new Type(t.image, false));
 	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
@@ -393,13 +397,14 @@ void WhileStatement() :
 {
 	int paraR;
 }
-{
+{	
+	<WHILE >
 	{
-		jjtThis.writeHeadLabe();
+		jjtThis.writeHeadLabel();
 	}
-	<WHILE > "(" paraR = Expression() ")" 
+	"(" paraR = Expression() ")" 
 	{
-		jjtThis.genInter(0, paraR);
+		jjtThis.genInter(0, paraR);		
 	}
 	Block()
 	{
@@ -414,10 +419,12 @@ void ForStatement() :
 	String id;
 }
 {
+	
+	<FOR >
 	{
 		jjtThis.writeHeadLabel();
 	}
-	<FOR > "(" (<VARIABLE_TYPE >)? id = MyID() <ASSIGNMENT_EQUAL_OPERATOR > paraL = Expression() <TO > paraR = Expression() ")" 
+	"(" (<VARIABLE_TYPE >)? id = MyID() <ASSIGNMENT_EQUAL_OPERATOR > paraL = Expression() <TO > paraR = Expression() ")" 
 	{
 		jjtThis.genInter(id, paraL, paraR);
 	}
@@ -489,6 +496,20 @@ int AssignmentExpression() :
 {
 	lhs = LeftSide() (op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()
 	{
+		Type type = curEnv.get(lhs);
+		if (type == null)
+			throw new ParseException("Undifine: "+ lhs);
+		if (type.isFunc)
+			throw new ParseException("Invalid parameter: "+ lhs);
+		if ((type == Type.Bool) && (jjtThis.typeRight != Type.Bool))
+			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtThis.typeRight.name);
+		if ((type != Type.Bool) && (jjtThis.typeRight == Type.Bool))
+			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtThis.typeRight.name);
+		if ((type == Type.Char) && (jjtThis.typeRight == Type.Real))
+			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtThis.typeRight.name);
+		if ((type == Type.Int) && (jjtThis.typeRight == Type.Real))
+			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtThis.typeRight.name);
+		jjtThis.typeRight = type;						
 		jjtThis.setLeftSide(lhs);
 		jjtThis.setOp(op.image);
 		return jjtThis.genInter(0, paraR);
@@ -507,14 +528,23 @@ int ConditionalExpression() : {}
 int ConditionalOrExpression() :
 {
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = ConditionalAndExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		"||" paraR = ConditionalAndExpression()
-		{			paraL = jjtThis.genInter(paraL, paraR);		}
+		
+		{
+			if ((typeLeft != Type.Bool) || (jjtThis.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: || / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.Bool;			paraL = jjtThis.genInter(paraL, paraR);		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -522,15 +552,23 @@ int ConditionalOrExpression() :
 int ConditionalAndExpression() :
 {
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = InclusiveOrExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		"&&" paraR = InclusiveOrExpression()
 		{
+			if ((typeLeft != Type.Bool) || (jjtThis.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: && / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.Bool;
 			paraL =  jjtThis.genInter(paraL, paraR);		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -538,16 +576,26 @@ int ConditionalAndExpression() :
 int InclusiveOrExpression() : 
 {
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = ExclusiveOrExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		"|" paraR = ExclusiveOrExpression()
 		{
+			if (typeLeft != Type.Int && typeLeft != Type.Char)
+				throw new ParseException("Error type of op: | / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			if (jjtThis.typeRight != Type.Int && jjtThis.typeRight != Type.Char)
+				throw new ParseException("Error type of op: | / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.max(typeLeft, jjtThis.typeRight);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -555,16 +603,26 @@ int InclusiveOrExpression() :
 int ExclusiveOrExpression() :
 {
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = AndExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		"^" paraR = AndExpression()
 		{
+			if (typeLeft != Type.Int && typeLeft != Type.Char)
+				throw new ParseException("Error type of op: ^ / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			if (jjtThis.typeRight != Type.Int && jjtThis.typeRight != Type.Char)
+				throw new ParseException("Error type of op: ^ / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.max(typeLeft, jjtThis.typeRight);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -572,16 +630,26 @@ int ExclusiveOrExpression() :
 int AndExpression() :
 {
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = EqualityExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		"&" paraR = EqualityExpression()
 		{
+			if (typeLeft != Type.Int && typeLeft != Type.Char)
+				throw new ParseException("Error type of op: & / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			if (jjtThis.typeRight != Type.Int && jjtThis.typeRight != Type.Char)
+				throw new ParseException("Error type of op: & / " + typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.max(typeLeft, jjtThis.typeRight);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -591,17 +659,27 @@ int EqualityExpression() :
 {
 	int paraL, paraR;
 	Token op = null;
+	Type typeLeft;
 }
 {
 	paraL = RelationalExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		(op = "==" | op = "!=") paraR = RelationalExpression()
 		{
+			if ((typeLeft == Type.Bool) && Type.numeric(jjtThis.typeRight))
+				throw new ParseException("Error type of op: " + op.image + " / "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			if ((jjtThis.typeRight == Type.Bool) && Type.numeric(typeLeft))
+				throw new ParseException("Error type of op: " + op.image + " / "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.Bool;
 			jjtThis.setOp(op.image);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -610,17 +688,25 @@ int RelationalExpression() :
 {
 	Token op = null;
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = ShiftExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		(op = "<"| op = ">" | op = "<=" | op = ">=") paraR = ShiftExpression()
 		{
+			if ((!Type.numeric(typeLeft)) || (!Type.numeric(jjtThis.typeRight)))
+				throw new ParseException("Error type of op: " + op.image + " / "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.Bool;
 			jjtThis.setOp(op.image);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -629,17 +715,27 @@ int ShiftExpression() :
 {
 	Token op = null;
 	int paraL, paraR;
+	Type typeLeft;
 }
 {
 	paraL = AdditiveExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		(op = "<<" | op = ">>") paraR = AdditiveExpression()
 		{
+			if (typeLeft != Type.Int && typeLeft != Type.Char)
+				throw new ParseException("Error type of op: " + op.image + " / "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			if (jjtThis.typeRight != Type.Int && jjtThis.typeRight != Type.Char)
+				throw new ParseException("Error type of op: " + op.image + " / "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = Type.Int;
 			jjtThis.setOp(op.image);
 			paraL =  jjtThis.genInter(paraL, paraR);
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -648,17 +744,26 @@ int AdditiveExpression() :
 {
 	Token op = null;
 	int paraL, paraR;
+	Type typeLeft, temp;
 }
 {
 	paraL = MultiplicativeExpression()
+	{
+		typeLeft = jjtThis.typeRight;
+	}
 	(
 		(op = "+" | op = "-") paraR = MultiplicativeExpression()
 		{
 			jjtThis.setOp(op.image);
 			paraL =  jjtThis.genInter(paraL, paraR);
+			temp = Type.max(typeLeft, jjtThis.typeRight);
+			if (temp == null)
+				throw new ParseException("Unmatched type: "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = temp;
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 }
 
@@ -667,17 +772,25 @@ int MultiplicativeExpression() :
 {
 	Token op = null;
 	int paraL, paraR;
+	Type typeLeft, temp;
 }
 {
 	paraL = UnaryExpression()
+	{
+		typeLeft = jjtThis.typeRight;	}
 	(
 		(op = "*" | op = "/" | op = "%") paraR = UnaryExpression()
 		{
 			jjtThis.setOp(op.image);
 			paraL = jjtThis.genInter(paraL, paraR);
+			temp = Type.max(typeLeft, jjtThis.typeRight);
+			if (temp == null)
+				throw new ParseException("Unmatched type: "+ typeLeft.name + " " + jjtThis.typeRight.name);
+			typeLeft = temp;
 		}
 	)*
 	{
+		jjtThis.typeRight = typeLeft;
 		return paraL;	}
 	
 }
@@ -695,10 +808,14 @@ int UnaryExpression() :
 		return jjtThis.getPara();	}
 	| op = "+" paraR = UnaryExpression()
 	{
+		if (!Type.numeric(jjtThis.typeRight))
+			throw new ParseException("Error type of op: +  / " +  jjtThis.typeRight.name);
 		jjtThis.setOp(op.image);
 		return jjtThis.genInter(0, paraR);	}
 	| op = "-" paraR = UnaryExpression()
 	{
+		if (!Type.numeric(jjtThis.typeRight))
+			throw new ParseException("Error type of op: -  / " + jjtThis.typeRight.name);
 		jjtThis.setOp(op.image);
 		return jjtThis.genInter(0, paraR);	}
 }
@@ -730,11 +847,15 @@ int SimpleUnaryExpression() :
 	}
 	| op = "~" paraR = UnaryExpression()
 	{
+		if (jjtThis.typeRight != Type.Int && jjtThis.typeRight != Type.Char)
+			throw new ParseException("Error type of op: ~ / " + jjtThis.typeRight.name);
 		jjtThis.setOp(op.image);
 		return jjtThis.genInter(0, paraR);
 	}
 	| op = "!" paraR = UnaryExpression()
 	{
+		if (Type.numeric(jjtThis.typeRight))
+			throw new ParseException("Error type of op: ! / " + jjtThis.typeRight.name);
 		jjtThis.setOp(op.image);
 		return jjtThis.genInter(0, paraR);
 	}
@@ -748,22 +869,40 @@ int Primary() :
 	String lhs;
 }
 {
-	t1 = <LITERAL >
+  	t1 = <INTEGER_LITERAL >
 	{
 		jjtThis.setName(t1.image);
+		jjtThis.typeRight = Type.Int;
 		return jjtThis.genInter();
 	}
-	| t1 = <INTEGER_LITERAL >
+	| t1 = <REAL_LITERAL >
 	{
-		jjtThis.setName(t1.image);
+		jjtThis.setName(t1.image);		
+		jjtThis.typeRight = Type.Real;
 		return jjtThis.genInter();
 	}
+	| t1 = <BOOLEAN_LITERAL >
+	{
+		jjtThis.setName(t1.image);		
+		jjtThis.typeRight = Type.Bool;
+		return jjtThis.genInter();
+	} 
+	| t1 = <CHARACTER_LITERAL >
+	{
+		jjtThis.setName(t1.image);		
+		jjtThis.typeRight = Type.Char;
+		return jjtThis.genInter();
+	}	
 	| lhs = LeftSide() (FunctionInvoke())?
 	{
-		jjtThis.setName(lhs);
-		return jjtThis.genInter();
-		if (curEnv.get(lhs) == null)
+		Type type = curEnv.get(lhs); 
+		if (type == null)
 			throw new ParseException("Undifine: "+ lhs);
+		if (type.isFunc)
+			throw new ParseException("Invalid parameter: "+ lhs);
+		jjtThis.typeRight = type;
+		jjtThis.setName(lhs);
+		return jjtThis.genInter();		
 	}
 	| "(" Primary2()
 }
