@@ -23,10 +23,11 @@ class ASTUnaryExpression extends SimpleNode {
 	}
 	
 	public int genInter(int paraL, int paraR) throws IOException {
-		content = "\n@t"
+		content = "@t"
 				+ Integer.toString(para)
 				+ " 0 " + op
-				+ " " + paraR;
+				+ " " + paraR
+				+ "\n";
 		writeInter();
 		return para;
 	}

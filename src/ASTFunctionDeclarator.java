@@ -29,15 +29,17 @@ public class ASTFunctionDeclarator extends SimpleNode {
   }
 
   public int genInter() throws IOException {
-	  content = "\n"
-			  + type + " "
+	  content = type + " "
 			  + name + " "
 			  + "proc ";
 	  writeInter();
 	  return 0;
   } 
   
-  
+  public void wirteReturn() throws IOException {
+	  content = "\n";
+	  writeInter();
+  }
   
 }
 

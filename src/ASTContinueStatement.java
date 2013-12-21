@@ -13,7 +13,8 @@ class ASTContinueStatement extends SimpleNode {
   }
 
   public int genInter() throws IOException {
-	  content = "\ngot L" + Integer.toString(continueLabel);
+	  content = "got L" + Integer.toString(continueLabel)
+			  + "\n";
 	  writeInter();
 	  return para;
   }

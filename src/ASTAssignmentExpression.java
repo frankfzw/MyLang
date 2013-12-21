@@ -29,10 +29,10 @@ public class ASTAssignmentExpression extends SimpleNode {
 	}
 	
 	public int genInter(int paraL, int paraR) throws IOException {
-		content = "\n" 
-				+ leftSide +" "
+		content = leftSide +" "
 				+ op + " @t"
-				+ Integer.toString(paraR);
+				+ Integer.toString(paraR)
+				+ "\n";
 		writeInter();
 		return para;
 	}

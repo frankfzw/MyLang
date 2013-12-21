@@ -37,5 +37,15 @@ public class ASTPrimary extends SimpleNode {
 		writeInter();
 		return para;
 	}
+  
+  public int genFuncInvoke(String id, int[] args) throws IOException {
+	  content = "invoke " + id;
+	  for (int i = 0; i < args.length; i ++) {
+		  content += " @t" + Integer.toString(args[i]);
+	  }
+	  content += "\n";
+	  writeInter();
+	  return para;
+  }
 
 }

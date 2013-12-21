@@ -17,26 +17,26 @@ class ASTConditionalOrExpression extends SimpleNode {
   }
 
   public int genInter(int paraL, int paraR) throws IOException {
-	  content = "\nif @t"
+	  content = "if @t"
 				+ Integer.toString(paraL)
 				+ " == 0 " 
-				+ " goto L" + Integer.toString(genLabel())
-				+ "\ngoto L" + Integer.toString(genLabel());
-	  content += "\nL"
+				+ " goto @L" + Integer.toString(genLabel())
+				+ "\ngoto @L" + Integer.toString(genLabel());
+	  content += "\n@L"
 				+ Integer.toString(genOldLabel())
-				+ ":\nif @t"
+				+ ": if @t"
 				+ Integer.toString(paraR)
 				+ " == 0 " 
-				+ " goto L" + Integer.toString(genLabel())
-				+ "\nL" + Integer.toString(genOldLabel())
+				+ " goto @L" + Integer.toString(genLabel())
+				+ "\n@L" + Integer.toString(genOldLabel())
 				+ ":"
-				+ "\n@t" + Integer.toString(genPara())
+				+ " @t" + Integer.toString(genPara())
 				+ " = 1"
-				+ "\ngoto L" + Integer.toString(genLabel())
-				+ "\nL" + Integer.toString(genOldLabel()) + ":"
-				+ "\n@t" + Integer.toString(para)
+				+ "\ngoto @L" + Integer.toString(genLabel())
+				+ "\n@L" + Integer.toString(genOldLabel()) + ":"
+				+ " @t" + Integer.toString(para)
 				+ " = 0"
-				+ "\nL" + Integer.toString(genOldLabel()) + ":";
+				+ "\n@L" + Integer.toString(genOldLabel()) + ": ";
 	  writeInter();
 	  return para;
   }

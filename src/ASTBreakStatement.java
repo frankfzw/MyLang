@@ -13,7 +13,8 @@ class ASTBreakStatement extends SimpleNode {
   }
   
   public int genInter() throws IOException {
-	  content = "\ngot L" + Integer.toString(breakLabel);
+	  content = "got @L" + Integer.toString(breakLabel)
+			  + "\n";
 	  writeInter();
 	  return para;
   }
