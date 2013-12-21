@@ -15,6 +15,9 @@ public class SimpleNode implements Node {
   protected static int oldLabel = 0;
   protected String content;
   
+  protected static int breakLabel;
+  protected static int continueLabel;
+  
 
   public SimpleNode(int i) {
     id = i;

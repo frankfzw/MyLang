@@ -6,6 +6,8 @@ import com.sun.org.apache.xml.internal.security.algorithms.implementations.Integ
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTIfStatement extends SimpleNode {
+	private int tailLabel;
+	
   public ASTIfStatement(int id) {
     super(id);
   }
@@ -15,13 +17,14 @@ class ASTIfStatement extends SimpleNode {
   }
 
   public int genInter(int paraL, int paraR) throws IOException {
-	  content = "\nt" + Integer.toString(genPara()) + " = t" + Integer.toString(paraR)
-			  + "\nif t" + Integer.toString(para) + " == 0 goto L" + Integer.toString(genLabel());
+	  tailLabel = genLabel();
+	  content = "\n@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
+			  + "\nif @t" + Integer.toString(para) + " == 0 goto L" + Integer.toString(tailLabel);
 	  writeInter();
 	  return para;
   }
   public void genTailLabel() throws IOException {
-	  content = "\nL" + Integer.toString(genOldLabel()) + ":";
+	  content = "\nL" + Integer.toString(tailLabel) + ":";
 	  writeInter();
   }
 }

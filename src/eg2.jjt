@@ -361,15 +361,42 @@ void IfStatement() :
 }
 
 /** A WhileStatement. */
-void WhileStatement() : {}
+void WhileStatement() : 
 {
-	<WHILE > "(" Expression() ")" Block()
+	int paraR;
+}
+{
+	{
+		jjtThis.writeHeadLabe();
+	}
+	<WHILE > "(" paraR = Expression() ")" 
+	{
+		jjtThis.genInter(0, paraR);
+	}
+	Block()
+	{
+		jjtThis.writeTailLabel();
+	}
 }
 
 /** for statement. */
-void ForStatement() : {}
+void ForStatement() : 
 {
-	<FOR > "(" (<VARIABLE_TYPE >)? MyID() <ASSIGNMENT_EQUAL_OPERATOR > Expression() <TO > Expression() ")" Block()
+	int paraL, paraR;
+	String id;
+}
+{
+	{
+		jjtThis.writeHeadLabel();
+	}
+	<FOR > "(" (<VARIABLE_TYPE >)? id = MyID() <ASSIGNMENT_EQUAL_OPERATOR > paraL = Expression() <TO > paraR = Expression() ")" 
+	{
+		jjtThis.genInter(id, paraL, paraR);
+	}
+	Block()
+	{
+		jjtThis.writeTailLabel();
+	}
 }
 
 /** foreach statement. */

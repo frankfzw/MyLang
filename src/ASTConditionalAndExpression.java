@@ -13,26 +13,26 @@ class ASTConditionalAndExpression extends SimpleNode {
   }
   
   public int genInter(int paraL, int paraR) throws IOException {
-	  content = "\nif t"
+	  content = "\nif @t"
 				+ Integer.toString(paraL)
 				+ " != 0 " 
 				+ " goto L" + Integer.toString(genLabel())
 				+ "\ngoto L" + Integer.toString(genLabel());
 	  content += "\nL"
 				+ Integer.toString(genOldLabel())
-				+ ":\nif t"
+				+ ":\nif @t"
 				+ Integer.toString(paraR)
 				+ " != 0 " 
 				+ " goto L" + Integer.toString(genLabel())
 				+ "\nL"
 				+ Integer.toString(genOldLabel())
 				+ ":"
-				+ "\nt" + Integer.toString(genPara())
+				+ "\n@t" + Integer.toString(genPara())
 				+ " = 0 "
 				+ "\ngoto L" + Integer.toString(genLabel())
 				+ "\nL" + Integer.toString(genOldLabel())
 				+ ":"
-				+ "\nt" + Integer.toString(para)
+				+ "\n@t" + Integer.toString(para)
 				+ " = 1 "
 				+ "\nL" + Integer.toString(genOldLabel())
 				+ ":";

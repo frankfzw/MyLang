@@ -24,19 +24,19 @@ class ASTEqualityExpression extends SimpleNode {
 	}
 	
 	public int genInter(int paraL, int paraR) throws IOException {
-		content = "\nif t"
+		content = "\nif @t"
 				+ Integer.toString(paraL)
 				+ " " + op
-				+ " t" + Integer.toString(paraR)
+				+ " @t" + Integer.toString(paraR)
 				+ " goto L" + Integer.toString(genLabel())
 				+ "\ngoto L" + Integer.toString(genLabel());
 		content += "\nL"
 				+ Integer.toString(genOldLabel())
-				+ ":\nt" + Integer.toString(genPara())
+				+ ":\n@t" + Integer.toString(genPara())
 				+ " = 1\n"
 				+ "L"
 				+ Integer.toString(genOldLabel())
-				+ ":\nt" + Integer.toString(para)
+				+ ":\n@t" + Integer.toString(para)
 				+ " = 0";
 		writeInter();
 		return para;

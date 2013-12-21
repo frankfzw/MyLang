@@ -13,14 +13,14 @@ class ASTInclusiveOrExpression extends SimpleNode {
   }
   
   public int genInter(int paraL, int paraR) throws IOException {
-		content = "\nt"
+		content = "\n@t"
 				+ Integer.toString(genPara()) + " = "
-				+ " t" + Integer.toString(paraL)
+				+ " @t" + Integer.toString(paraL)
 				+ " | "
-				+ " t" + Integer.toString(paraR);
+				+ " @t" + Integer.toString(paraR);
 		writeInter();
 		return para;
-}
+  }
 
 }
 /* JavaCC - OriginalChecksum=a650e89272425b40001da1d406063515 (do not edit this line) */
