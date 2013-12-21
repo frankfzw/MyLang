@@ -278,7 +278,11 @@ void FunctionDeclarator() :
 		Env savedEnv = curEnv;
 		curEnv = new Env(curEnv);
 	}
-	"(" (FunctionParameterList())? ")" FunctionBody()
+	"(" (FunctionParameterList())? ")" 
+	{
+		jjtThis.writeReturn();
+	}
+	FunctionBody()
 	{
 		curEnv = savedEnv;	}
 }
@@ -449,9 +453,15 @@ void ContinueStatement() : {}
 }
 
 /** return statement. */
-void ReturnStatement() : {}
+void ReturnStatement() : 
 {
-	<RETURN > (Expression())? ";"
+	int paraL;
+}
+{
+	<RETURN > (paraL = Expression())? ";"
+	{
+		jjtThis.genInter(paraL, 0);
+	}
 }
 
 /** comment statement. */

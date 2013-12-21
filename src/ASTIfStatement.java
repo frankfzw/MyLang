@@ -18,13 +18,14 @@ class ASTIfStatement extends SimpleNode {
 
   public int genInter(int paraL, int paraR) throws IOException {
 	  tailLabel = genLabel();
-	  content = "\n@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
-			  + "\nif @t" + Integer.toString(para) + " == 0 goto L" + Integer.toString(tailLabel);
+	  content = "@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
+			  + "\nif @t" + Integer.toString(para) + " == 0 goto @L" + Integer.toString(tailLabel)
+			  + "\n";
 	  writeInter();
 	  return para;
   }
   public void genTailLabel() throws IOException {
-	  content = "\nL" + Integer.toString(tailLabel) + ":";
+	  content = "@L" + Integer.toString(tailLabel) + ": ";
 	  writeInter();
   }
 }

@@ -13,12 +13,7 @@ class ASTBlock extends SimpleNode {
   }
   
   public int genInter(int paraL, int paraR) throws IOException {
-	  int labelNum = genOldLabel();
-	  if (labelNum != -1) {
-		  content = "\nL" + Integer.toString(labelNum)
-				  + ":";
-		  writeInter();
-	  }
+	  
 	  return 0;
   }
 

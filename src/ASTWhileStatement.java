@@ -15,26 +15,29 @@ class ASTWhileStatement extends SimpleNode {
     super(p, id);
   }
   
-  public void writeHeadLabel() throws IOException {
+  public int writeHeadLabel() throws IOException {
 	  headLabel = genLabel();
 	  continueLabel = headLabel;
-	  content = "\nL" + Integer.toString(headLabel) + ":";
+	  content = "@L" + Integer.toString(headLabel) + ": ";
 	  writeInter();
+	  return headLabel;
   }
   
   public int genInter(int paraL, int paraR) throws IOException {
 	  tailLabel = genLabel();
 	  breakLabel = tailLabel;
-	  content = "\n@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
-			  + "\nif @t" + Integer.toString(para) + " == 0 goto L" + Integer.toString(tailLabel);
+	  content = "@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
+			  + "\nif @t" + Integer.toString(para) + " == 0 goto @L" + Integer.toString(tailLabel)
+			  + "\n";
 	  writeInter();
 	  return para;
   }
-  
-  public void writeTailLabel() throws IOException {
-	  content = "\ngoto L" + Integer.toString(headLabel)
-			  + "\nL" + Integer.toString(tailLabel) + ":";
+ 
+  public int writeTailLabel() throws IOException {
+	  content = "goto @L" + Integer.toString(headLabel)
+			  + "\n@L" + Integer.toString(tailLabel) + ": ";
 	  writeInter();
+	  return tailLabel;
   }
 }
 /* JavaCC - OriginalChecksum=295e09f0e4126e4e0f72780a27183f4d (do not edit this line) */

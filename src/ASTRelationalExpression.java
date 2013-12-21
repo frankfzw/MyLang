@@ -38,20 +38,20 @@ public class ASTRelationalExpression extends SimpleNode {
 	}
 	
 	public int genInter(int paraL, int paraR) throws IOException {
-		content = "\nif @t"
+		content = "if @t"
 				+ Integer.toString(paraL)
 				+ " " + op
 				+ " @t" + Integer.toString(paraR)
-				+ " goto L" + Integer.toString(genLabel());
+				+ " goto @L" + Integer.toString(genLabel());
 		content += "\n@t" + Integer.toString(genPara())
 				+ " = 0\n"
-				+ "goto L"
+				+ "goto @L"
 				+ Integer.toString(genLabel())
-				+ "\nL"
+				+ "\n@L"
 				+ Integer.toString(genOldLabel())
-				+ ":\n@t" + Integer.toString(para)
-				+ " = 1\nL" + Integer.toString(genOldLabel())
-				+ ":";
+				+ ": @t" + Integer.toString(para)
+				+ " = 1\n@L" + Integer.toString(genOldLabel())
+				+ ": ";
 		writeInter();
 		return para;
 	}
