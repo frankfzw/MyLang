@@ -33,9 +33,10 @@ class ASTForStatement extends SimpleNode {
 	  return para;
   }
   
-  public void writeTailLabel() {
+  public void writeTailLabel() throws IOException {
 	  content = "\ngoto L" + Integer.toString(headLabel)
 			  + "\nL" + Integer.toString(tailLabel) + ":";
+	  writeInter();
   }
 }
 /* JavaCC - OriginalChecksum=ca57cc63ce44c379797e0b21d4047f63 (do not edit this line) */

@@ -47,37 +47,35 @@ public interface Eg2Constants {
   /** RegularExpression Id. */
   int REAL_LITERAL = 25;
   /** RegularExpression Id. */
-  int LITERAL = 26;
+  int BOOLEAN_LITERAL = 26;
   /** RegularExpression Id. */
-  int NON_ZERO_DIGIT = 27;
+  int NULL_LITERAL = 27;
   /** RegularExpression Id. */
-  int DIGIT = 28;
+  int CHARACTER_LITERAL = 28;
   /** RegularExpression Id. */
-  int DIGITS = 29;
+  int NON_ZERO_DIGIT = 29;
   /** RegularExpression Id. */
-  int DECIMAL_NUMERAL = 30;
+  int DIGIT = 30;
   /** RegularExpression Id. */
-  int HEX_DIGIT = 31;
+  int DIGITS = 31;
   /** RegularExpression Id. */
-  int HEX_NUMERAL = 32;
+  int DECIMAL_NUMERAL = 32;
   /** RegularExpression Id. */
-  int OCTAL_DIGIT = 33;
+  int HEX_DIGIT = 33;
   /** RegularExpression Id. */
-  int OCTAL_NUMERAL = 34;
+  int HEX_NUMERAL = 34;
   /** RegularExpression Id. */
-  int BOOLEAN_LITERAL = 35;
+  int OCTAL_DIGIT = 35;
   /** RegularExpression Id. */
-  int NULL_LITERAL = 36;
+  int OCTAL_NUMERAL = 36;
   /** RegularExpression Id. */
-  int CHARACTER_LITERAL = 37;
+  int IDENTIFIER = 37;
   /** RegularExpression Id. */
-  int IDENTIFIER = 38;
+  int LETTER = 38;
   /** RegularExpression Id. */
-  int LETTER = 39;
+  int ASSIGNMENT_EQUAL_OPERATOR = 39;
   /** RegularExpression Id. */
-  int ASSIGNMENT_EQUAL_OPERATOR = 40;
-  /** RegularExpression Id. */
-  int ASSIGNMENT_OPERATOR = 41;
+  int ASSIGNMENT_OPERATOR = 40;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -110,7 +108,9 @@ public interface Eg2Constants {
     "\"void\"",
     "<INTEGER_LITERAL>",
     "<REAL_LITERAL>",
-    "<LITERAL>",
+    "<BOOLEAN_LITERAL>",
+    "\"null\"",
+    "<CHARACTER_LITERAL>",
     "<NON_ZERO_DIGIT>",
     "<DIGIT>",
     "<DIGITS>",
@@ -119,9 +119,6 @@ public interface Eg2Constants {
     "<HEX_NUMERAL>",
     "<OCTAL_DIGIT>",
     "<OCTAL_NUMERAL>",
-    "<BOOLEAN_LITERAL>",
-    "\"null\"",
-    "<CHARACTER_LITERAL>",
     "<IDENTIFIER>",
     "<LETTER>",
     "\"=\"",

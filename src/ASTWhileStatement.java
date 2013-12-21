@@ -31,9 +31,10 @@ class ASTWhileStatement extends SimpleNode {
 	  return para;
   }
   
-  public void writeTailLabel() {
+  public void writeTailLabel() throws IOException {
 	  content = "\ngoto L" + Integer.toString(headLabel)
 			  + "\nL" + Integer.toString(tailLabel) + ":";
+	  writeInter();
   }
 }
 /* JavaCC - OriginalChecksum=295e09f0e4126e4e0f72780a27183f4d (do not edit this line) */
