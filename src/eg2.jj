@@ -480,7 +480,11 @@ void FunctionDeclarator() :
 		Env savedEnv = curEnv;
 		curEnv = new Env(curEnv);
 	}
-	"(" (FunctionParameterList())? ")" FunctionBody()/*@bgen(jjtree)*/
+	"(" (FunctionParameterList())? ")" 
+	{
+		jjtn000.writeReturn();
+	}
+	FunctionBody()/*@bgen(jjtree)*/
         {
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
@@ -1034,15 +1038,23 @@ void ContinueStatement() : {/*@bgen(jjtree) ContinueStatement */
 }
 
 /** return statement. */
-void ReturnStatement() : {/*@bgen(jjtree) ReturnStatement */
-  ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+void ReturnStatement() : 
+{/*@bgen(jjtree) ReturnStatement */
+        ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	int paraL;
+}
 {/*@bgen(jjtree) ReturnStatement */
         try {
 /*@egen*/
-	<RETURN > (Expression())? ";"/*@bgen(jjtree)*/
+	<RETURN >
+	(
+		paraL = Expression()
+		{
+			jjtn000.genInter(paraL, 0);		}
+	)? ";"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);

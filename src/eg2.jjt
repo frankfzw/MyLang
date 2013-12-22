@@ -458,10 +458,12 @@ void ReturnStatement() :
 	int paraL;
 }
 {
-	<RETURN > (paraL = Expression())? ";"
-	{
-		jjtThis.genInter(paraL, 0);
-	}
+	<RETURN >
+	(
+		paraL = Expression()
+		{
+			jjtThis.genInter(paraL, 0);		}
+	)? ";"
 }
 
 /** comment statement. */

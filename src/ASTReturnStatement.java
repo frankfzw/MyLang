@@ -13,9 +13,10 @@ class ASTReturnStatement extends SimpleNode {
   }
 
   public int genInter(int paraL, int paraR) throws IOException {
-	  content = "ret\n";
+	  content = "ret ";
 	  if (paraL != 0)
 		  content += Integer.toString(paraL);
+	  content += "\n";
 	  writeInter();
 	  return para;
   }
