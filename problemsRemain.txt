@@ -4,7 +4,7 @@
 3 ++ -- 类型判断 
 4 type cast
 5 asm全局env，函数和变量分开？
-6 if elseif else 跳转流
+//6 if elseif else 跳转流
 7 foreach
 
 //--------------------------------------

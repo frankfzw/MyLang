@@ -81,7 +81,7 @@ public class CFG {
 			case FUNC:
 				break;
 			case INVALID:
-				throw new IOException("wrong inter code\n");
+				break;
 			default:
 				break;
 			}

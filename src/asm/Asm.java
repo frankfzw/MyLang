@@ -82,8 +82,8 @@ public class Asm {
 			val += LABEL;
 			index ++;
 		}
-		if (length == 1)
-			return LABEL + val;
+		if (length == 0)
+			return INVALID;
 		if ((length == 3) && (ins[1 + index].compareTo("=") == 0))
 			return ASSIGNMENT + val;
 		if ((length == 5) && (ins[1 + index].compareTo("=") == 0))
@@ -187,6 +187,10 @@ public class Asm {
 	}
 	public void transAssignment(int pos, String[] ins) {
 		//use move
+		if(ins[2 + pos].compareTo("true") == 0)
+			ins[2 + pos] = "1";
+		if(ins[2 + pos].compareTo("false") == 0)
+			ins[2 + pos] = "0";
 		String temp = "mov " + transPara(ins[pos]) + ", " +transPara(ins[pos + 2]);
 		asm.add(temp);
 	}
@@ -227,6 +231,7 @@ public class Asm {
 	public void transIf(int pos, String[] ins) {
 		//cmp to regs
 		String temp = "cmp ";
+		temp += transPara(ins[pos + 1]) + ", " + transPara(ins[pos + 3]);
 		asm.add(temp);
 		String op = ins[2 + pos];
 		if(op.compareTo("==") == 0) {

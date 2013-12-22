@@ -1,6 +1,4 @@
 int a()
 {
-	bool a = true;
-	while(a)
-		int a = 1;
+	for(a = '1' to '3');
 }

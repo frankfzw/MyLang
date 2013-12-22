@@ -48,9 +48,9 @@ public class ASTRelationalExpression extends SimpleNode {
 				+ "goto @L"
 				+ Integer.toString(genLabel())
 				+ "\n@L"
-				+ Integer.toString(genOldLabel())
+				+ Integer.toString(label - 1)
 				+ ": @t" + Integer.toString(para)
-				+ " = 1\n@L" + Integer.toString(genOldLabel())
+				+ " = 1\n@L" + Integer.toString(label)
 				+ ": ";
 		writeInter();
 		return para;
