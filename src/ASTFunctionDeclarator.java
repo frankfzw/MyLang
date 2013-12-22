@@ -36,7 +36,7 @@ public class ASTFunctionDeclarator extends SimpleNode {
 	  return 0;
   } 
   
-  public void wirteReturn() throws IOException {
+  public void writeReturn() throws IOException {
 	  content = "\n";
 	  writeInter();
   }

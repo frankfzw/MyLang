@@ -1,5 +1,6 @@
 int a()
 {
-	bool a;
-	a  = 1;
+	bool a = true;
+	while(a)
+		int a = 1;
 }

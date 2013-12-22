@@ -5,6 +5,7 @@ public class Type{
    public int width = 0;          // width is used for storage allocation
    public String name = "";
    public boolean isFunc = false;
+   public boolean isArray = false;
    
    public Type(String s, int w) {name = s; width = w;}
 

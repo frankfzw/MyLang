@@ -19,8 +19,8 @@ public class Asm {
 	public static final int RET = 6;
 	public static final int LABEL = 7;
 	
-	private String funcList;
-	private String uniParaList;
+	private String funcList = "";
+	private String uniParaList = "";
 	private ArrayList<String> asm = new ArrayList<String>();
 	
 	public String getFuncList() {
@@ -41,7 +41,7 @@ public class Asm {
 		
 	}
 
-	public void parseInter() throws IOException {
+	public void optInter() throws IOException {
 		//from file
 		File file = new File("interCode.txt");
 		if (!file.exists()) {
@@ -60,7 +60,10 @@ public class Asm {
 		//parse here cr
 		String line = reader.readLine();
 		while(line != null) {
-			
+			//remove this while optimizing
+			writer.write(line);
+			writer.write("\n");
+			line = reader.readLine();
 		}
 		
 		//close file
@@ -122,7 +125,13 @@ public class Asm {
 				
 	}
 	public void translate() throws IOException {
+		//optimize intermidate code
+		optInter();
 		
+		//write asm head
+		writeHead();
+		
+		//translate asm body
 		File file = new File("optInterCode.txt");
 		if (!file.exists()) {
 			throw new IOException("intermediate code doesn't exist!\n");
@@ -142,48 +151,72 @@ public class Asm {
 			switch(type) {
 			case ASSIGNMENT:
 				transAssignment(pos, ins);
+				break;
 			case THREEADDRESS:
 				transThreeAddress(pos, ins);
+				break;
 			case GOTO:
 				transGoto(pos, ins);
+				break;
 			case IF:
 				transIf(pos, ins);
+				break;
 			case FUNC:
 				transFunc(pos, ins);
+				break;
 			case INVOKE:
 				transInvoke(pos, ins);
+				break;
 			case RET:
 				transRet(pos, ins);
+				break;
 			}
 		}
-		
+
 		//write asm
 		file = new File("ASM.txt");
 		if (!file.exists()) {
 			throw new IOException("ASM code doesn't exist!\n");
 		}
-		FileWriter writer = new FileWriter(file);
+		FileWriter writer = new FileWriter(file, true);
 		for(String s : asm) {
 			writer.write(s);
+			writer.write("\n");
 		}
 		writer.close();
 	}
 	public void transAssignment(int pos, String[] ins) {
 		//use move
+		String temp = "mov " + transPara(ins[pos]) + ", " +transPara(ins[pos + 2]);
+		asm.add(temp);
 	}
 	public void transThreeAddress(int pos, String[] ins) {
 		String op = ins[2 + pos];
+		String temp = "mov " + transPara(ins[pos]) + ", "  + transPara(ins[pos + 2]);
+		asm.add(temp);
 		if(op.compareTo("+") == 0) {
 			//add
+			temp = "add " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
+			asm.add(temp);
+			return;
 		}
 		if(op.compareTo("-") == 0) {
 			//sub
+			temp = "dec " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
+			asm.add(temp);
+			return;
 		}
 		if(op.compareTo("*") == 0) {
-			//muti
+			//multi
+			temp = "mul " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
+			asm.add(temp);
+			return;
 		}
 		if(op.compareTo("/") == 0) {
 			//div
+			temp = "div " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
+			asm.add(temp);
+			return;
 		}
 	}
 	public void transGoto(int pos, String[] ins) {
@@ -219,7 +252,7 @@ public class Asm {
 	}
 	public void transFunc(int pos, String[] ins) {
 		String temp = ins[0 + pos] + " " + ins[1 + pos] + " ";
-		for(int i = pos + 1; i < ins.length; i ++) {
+		for(int i = pos + 3; i < ins.length; i ++) {
 			String para[] = ins[i].split(":");
 			if(para[1].compareTo("int") == 0) {
 				para[1] = "dword";
@@ -230,7 +263,7 @@ public class Asm {
 			else {
 				para[1] = "byte";
 			}
-			temp += para[0] + para[1] + " ";
+			temp += para[0] + ":" + para[1] + " ";
 		}
 		asm.add(temp);
 	}
@@ -238,14 +271,23 @@ public class Asm {
 		String temp = "";
 		for(int i = pos; i < ins.length; i ++) {
 			//problems
-			temp += ins[i];
+			temp += transPara(ins[i]) + " ";
 		}
 		asm.add(temp);
 	}	
 	public void transRet(int pos, String[] ins) {
-		String temp = "ret ";
-		if(ins.length > (pos + 1))
-			temp += ins[pos + 1];
+		String temp;
+		if(ins.length > (pos + 1)) {
+			//mov ret val to eax
+			temp = "mov eax, " + transPara(ins[pos + 1]);
+			asm.add(temp);
+		}
+		temp = "ret ";
 		asm.add(temp);
 	}
+	
+	public String transPara(String para) {
+		return para;
+	}
+	
 }

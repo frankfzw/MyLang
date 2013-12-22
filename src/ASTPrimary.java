@@ -31,9 +31,10 @@ public class ASTPrimary extends SimpleNode {
   }
   
   public int genInter() throws IOException {
-		content = "\n@t"
+		content = "@t"
 				+ Integer.toString(genPara()) + " = "
-				+ name;
+				+ name
+				+ "\n";
 		writeInter();
 		return para;
 	}
