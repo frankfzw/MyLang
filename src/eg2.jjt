@@ -179,37 +179,66 @@ void UniversalDeclarator() :
 {
 	Token t = null;
 	String id;
+	Type type;
+	int paraR;
 }
 {
 	(<CONST >)? t = <VARIABLE_TYPE > id = MyID()
 	{
 		jjtThis.setName(t.image);
+		jjtThis.setId(id);
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
 		String s = t.image;
 		if (s.compareTo("int") == 0)
-		   curEnv.put(id, Type.Int);
+			type = Type.Int;
 		else if (s.compareTo("bool") == 0)
-			curEnv.put(id, Type.Bool);
+			type = Type.Bool;
 		else if (s.compareTo("real") == 0)
-			curEnv.put(id, Type.Real);
+			type = Type.Real;
 		else if (s.compareTo("char") == 0)
-			curEnv.put(id, Type.Char);
-		
+			type = Type.Char;
+		else
+			throw new ParseException("Unknow type");
+		curEnv.put(id, type);
 	}	
 	(
-		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
+		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
+		{
+		  	jjtThis.genInter(0, paraR);
+		  	
+			if ((type == Type.Bool) && (jjtThis.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type != Type.Bool) && (jjtThis.typeRight == Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Char) && (jjtThis.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Int) && (jjtThis.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);		}
 	|
 		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
 	(
 		"," id = MyID()
 		{
+		  	jjtThis.setId(id);
 			if (curEnv.contains(id))
 				throw new ParseException("Redifine: "+ id);
-			curEnv.put(id, new Type(t.image, false));		}
+			curEnv.put(id, type);		}
 		(
-		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
+		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
+		{
+		  	jjtThis.genInter(0, paraR);
+		  	
+			if ((type == Type.Bool) && (jjtThis.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type != Type.Bool) && (jjtThis.typeRight == Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Char) && (jjtThis.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Int) && (jjtThis.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
+		}
 		|
 			"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 		)?
@@ -329,7 +358,7 @@ void FunctionBody() : {}
 void Block() : {}
 {
 	"{" BlockStatements() "}"
-	| Statement()
+	| BlockStatement()
 }
 
 /** block statements. */
@@ -384,12 +413,45 @@ void IfStatement() :
 {
 	<IF > "(" paraR = Expression() ")"
 	{
+		if (jjtThis.typeRight != Type.Bool)
+			throw new ParseException("Error type of ifStatement: " + jjtThis.typeRight.name);		
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 		jjtThis.genInter(0, paraR);	}
 	Block()
 	{
-	 	jjtThis.genTailLabel();	}
-	(LOOKAHEAD(2) <ELSE > <IF > "(" Expression() ")" Block())* (<ELSE > Block())?
-	
+	  	curEnv = savedEnv;	 		}
+	(
+		LOOKAHEAD(2) <ELSE > <IF >
+		{
+			jjtThis.genElseLabel();		}
+		"(" paraR = Expression() ")"
+		{
+		  	jjtThis.genInter(0, paraR);
+			if (jjtThis.typeRight != Type.Bool)
+				throw new ParseException("Error type of ifStatement: " + jjtThis.typeRight.name);		
+			savedEnv = curEnv;
+			curEnv = new Env(curEnv);
+		}
+		Block()
+		{
+		  	curEnv = savedEnv;
+		}
+	)*
+	(
+		<ELSE >
+		{
+		  	jjtThis.genElseLabel();
+			savedEnv = curEnv;
+			curEnv = new Env(curEnv);
+		}
+		Block()
+		{
+		  	curEnv = savedEnv;
+		}
+	)?
+	{
+		jjtThis.genTailLabel();	}
 }
 
 /** A WhileStatement. */
@@ -404,11 +466,16 @@ void WhileStatement() :
 	}
 	"(" paraR = Expression() ")" 
 	{
+		if (jjtThis.typeRight != Type.Bool)
+			throw new ParseException("Error type of whileStatement: " + jjtThis.typeRight.name);		
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 		jjtThis.genInter(0, paraR);		
 	}
 	Block()
 	{
 		jjtThis.writeTailLabel();
+		curEnv = savedEnv;
 	}
 }
 
@@ -417,14 +484,49 @@ void ForStatement() :
 {
 	int paraL, paraR;
 	String id;
+	Token t = null;
 }
 {
 	
 	<FOR >
 	{
-		jjtThis.writeHeadLabel();
+		//jjtThis.writeHeadLabel();
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 	}
-	"(" (<VARIABLE_TYPE >)? id = MyID() <ASSIGNMENT_EQUAL_OPERATOR > paraL = Expression() <TO > paraR = Expression() ")" 
+	"(" (t = <VARIABLE_TYPE >)? id = MyID()
+		{
+			Type type;
+			if (t != null)
+			{
+			  	String s = t.image;					if (s.compareTo("int") == 0)
+					type = Type.Int;
+				else if (s.compareTo("char") == 0)
+					type = Type.Char;
+				else
+					throw new ParseException("Invalid type in forStatement");
+				curEnv.put(id, type);
+			}
+			else
+			{
+				type = curEnv.get(id);
+				if (type == null)
+					throw new ParseException("Undifine id in forStatement: " + id);			}		}
+		<ASSIGNMENT_EQUAL_OPERATOR >
+		paraL = Expression()
+		{
+			if ((type == Type.Int) && ((jjtThis.typeRight != Type.Int) && (jjtThis.typeRight != Type.Char)))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Char) && (jjtThis.typeRight != Type.Char))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);		}
+		<TO >
+		paraR = Expression()
+		{
+			if ((type == Type.Int) && ((jjtThis.typeRight != Type.Int) && (jjtThis.typeRight != Type.Char)))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);
+			if ((type == Type.Char) && (jjtThis.typeRight != Type.Char))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);		}
+	")" 
 	{
 		jjtThis.genInter(id, paraL, paraR);
 	}
@@ -463,7 +565,8 @@ void ReturnStatement() :
 		paraL = Expression()
 		{
 			jjtThis.genInter(paraL, 0);		}
-	)? ";"
+	)? 
+	";"
 }
 
 /** comment statement. */

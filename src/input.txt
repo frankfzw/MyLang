@@ -1,5 +1,4 @@
 int a()
 {
-	bool a;
-	a  = 1;
+	for(a = '1' to '3');
 }

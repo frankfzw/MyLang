@@ -244,6 +244,8 @@ void UniversalDeclarator() :
 /*@egen*/
 	Token t = null;
 	String id;
+	Type type;
+	int paraR;
 }
 {/*@bgen(jjtree) UniversalDeclarator */
         try {
@@ -251,32 +253,59 @@ void UniversalDeclarator() :
 	(<CONST >)? t = <VARIABLE_TYPE > id = MyID()
 	{
 		jjtn000.setName(t.image);
+		jjtn000.setId(id);
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
 		String s = t.image;
 		if (s.compareTo("int") == 0)
-		   curEnv.put(id, Type.Int);
+			type = Type.Int;
 		else if (s.compareTo("bool") == 0)
-			curEnv.put(id, Type.Bool);
+			type = Type.Bool;
 		else if (s.compareTo("real") == 0)
-			curEnv.put(id, Type.Real);
+			type = Type.Real;
 		else if (s.compareTo("char") == 0)
-			curEnv.put(id, Type.Char);
-		
+			type = Type.Char;
+		else
+			throw new ParseException("Unknow type");
+		curEnv.put(id, type);
 	}	
 	(
-		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
+		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
+		{
+		  	jjtn000.genInter(0, paraR);
+		  	
+			if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Char) && (jjtn000.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Int) && (jjtn000.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);		}
 	|
 		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
 	(
 		"," id = MyID()
 		{
+		  	jjtn000.setId(id);
 			if (curEnv.contains(id))
 				throw new ParseException("Redifine: "+ id);
-			curEnv.put(id, new Type(t.image, false));		}
+			curEnv.put(id, type);		}
 		(
-		<ASSIGNMENT_EQUAL_OPERATOR > Expression()
+		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
+		{
+		  	jjtn000.genInter(0, paraR);
+		  	
+			if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Char) && (jjtn000.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Int) && (jjtn000.typeRight == Type.Real))
+				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
+		}
 		|
 			"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 		)?
@@ -640,6 +669,7 @@ void Block() : {/*@bgen(jjtree) Block */
         try {
 /*@egen*/
 	"{" BlockStatements() "}"
+<<<<<<< HEAD
 	| Statement()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -660,6 +690,28 @@ void Block() : {/*@bgen(jjtree) Block */
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
+=======
+	| BlockStatement()/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 }
 
@@ -837,9 +889,14 @@ void IfStatement() :
 /*@egen*/
 	<IF > "(" paraR = Expression() ")"
 	{
+		if (jjtn000.typeRight != Type.Bool)
+			throw new ParseException("Error type of ifStatement: " + jjtn000.typeRight.name);		
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 		jjtn000.genInter(0, paraR);	}
 	Block()
 	{
+<<<<<<< HEAD
 	 	jjtn000.genTailLabel();	}
 	(LOOKAHEAD(2) <ELSE > <IF > "(" Expression() ")" Block())* (<ELSE > Block())?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
@@ -861,8 +918,65 @@ void IfStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
+=======
+	  	curEnv = savedEnv;	 		}
+	(
+		LOOKAHEAD(2) <ELSE > <IF >
+		{
+			jjtn000.genElseLabel();		}
+		"(" paraR = Expression() ")"
+		{
+		  	jjtn000.genInter(0, paraR);
+			if (jjtn000.typeRight != Type.Bool)
+				throw new ParseException("Error type of ifStatement: " + jjtn000.typeRight.name);		
+			savedEnv = curEnv;
+			curEnv = new Env(curEnv);
+		}
+		Block()
+		{
+		  	curEnv = savedEnv;
+		}
+	)*
+	(
+		<ELSE >
+		{
+		  	jjtn000.genElseLabel();
+			savedEnv = curEnv;
+			curEnv = new Env(curEnv);
+		}
+		Block()
+		{
+		  	curEnv = savedEnv;
+		}
+	)?/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
 /*@egen*/
-	
+	{
+		jjtn000.genTailLabel();	}/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
+/*@egen*/
 }
 
 /** A WhileStatement. */
@@ -883,6 +997,10 @@ void WhileStatement() :
 	}
 	"(" paraR = Expression() ")" 
 	{
+		if (jjtn000.typeRight != Type.Bool)
+			throw new ParseException("Error type of whileStatement: " + jjtn000.typeRight.name);		
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 		jjtn000.genInter(0, paraR);		
 	}
 	Block()/*@bgen(jjtree)*/
@@ -893,6 +1011,7 @@ void WhileStatement() :
 /*@egen*/
 	{
 		jjtn000.writeTailLabel();
+<<<<<<< HEAD
 	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -913,6 +1032,29 @@ void WhileStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
+=======
+		curEnv = savedEnv;
+	}/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 }
 
@@ -925,6 +1067,7 @@ void ForStatement() :
 /*@egen*/
 	int paraL, paraR;
 	String id;
+	Token t = null;
 }
 {/*@bgen(jjtree) ForStatement */
         try {
@@ -932,9 +1075,43 @@ void ForStatement() :
 	
 	<FOR >
 	{
-		jjtn000.writeHeadLabel();
+		//jjtThis.writeHeadLabel();
+		Env savedEnv = curEnv;
+		curEnv = new Env(curEnv);
 	}
-	"(" (<VARIABLE_TYPE >)? id = MyID() <ASSIGNMENT_EQUAL_OPERATOR > paraL = Expression() <TO > paraR = Expression() ")" 
+	"(" (t = <VARIABLE_TYPE >)? id = MyID()
+		{
+			Type type;
+			if (t != null)
+			{
+			  	String s = t.image;					if (s.compareTo("int") == 0)
+					type = Type.Int;
+				else if (s.compareTo("char") == 0)
+					type = Type.Char;
+				else
+					throw new ParseException("Invalid type in forStatement");
+				curEnv.put(id, type);
+			}
+			else
+			{
+				type = curEnv.get(id);
+				if (type == null)
+					throw new ParseException("Undifine id in forStatement: " + id);			}		}
+		<ASSIGNMENT_EQUAL_OPERATOR >
+		paraL = Expression()
+		{
+			if ((type == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Char) && (jjtn000.typeRight != Type.Char))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);		}
+		<TO >
+		paraR = Expression()
+		{
+			if ((type == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);
+			if ((type == Type.Char) && (jjtn000.typeRight != Type.Char))
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);		}
+	")" 
 	{
 		jjtn000.genInter(id, paraL, paraR);
 	}
@@ -1039,6 +1216,7 @@ void ContinueStatement() : {/*@bgen(jjtree) ContinueStatement */
 
 /** return statement. */
 void ReturnStatement() : 
+<<<<<<< HEAD
 {/*@bgen(jjtree) ReturnStatement */
         ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
         boolean jjtc000 = true;
@@ -1048,11 +1226,23 @@ void ReturnStatement() :
 }
 {/*@bgen(jjtree) ReturnStatement */
         try {
+=======
+{/*@bgen(jjtree) ReturnStatement */
+        ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	int paraL;
+}
+{/*@bgen(jjtree) ReturnStatement */
+        try {
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 	<RETURN >
 	(
 		paraL = Expression()
 		{
+<<<<<<< HEAD
 			jjtn000.genInter(paraL, 0);		}
 	)? ";"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
@@ -1074,7 +1264,33 @@ void ReturnStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
+=======
+			jjtn000.genInter(paraL, 0);
+		}
+	)?
+	";"/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
+	
 }
 
 /** comment statement. */

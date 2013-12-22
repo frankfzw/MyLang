@@ -1,13 +1,33 @@
-1. 括号表达式
+1.括号表达式
 2.invoke返回的时候要把类型isfunc改为false
 2.1 function invoke 转asm
 3 ++ -- 类型判断 
 4 type cast
 5 asm全局env，函数和变量分开？
+//6 if elseif else 跳转流
+7 foreach
 
-test
-int a = 1<<2;
+//--------------------------------------
+int b(int a)
+{
+	return 0;
+}
+int a()
+{
+	int a = 0;
+	if (1 > 2 || 3 > 4)
+		return 1;
+	a = b(a);
+	//b(a);
+	return a;
+}
 
-int a = 1 < true;
-！
-~
+//----------------------------------------
+int a()
+{
+	if (1)
+		int a = 0;
+}
+
+//----------------------------------------
+中间代码类型

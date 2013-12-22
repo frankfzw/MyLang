@@ -135,6 +135,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t = null;
         String id;
+        Type type;
+        int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case CONST:
@@ -147,24 +149,38 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       t = jj_consume_token(VARIABLE_TYPE);
       id = MyID();
                 jjtn000.setName(t.image);
+                jjtn000.setId(id);
                 if (curEnv.contains(id))
                         {if (true) throw new ParseException("Redifine: "+ id);}
                 String s = t.image;
                 if (s.compareTo("int") == 0)
-                   curEnv.put(id, Type.Int);
+                        type = Type.Int;
                 else if (s.compareTo("bool") == 0)
-                        curEnv.put(id, Type.Bool);
+                        type = Type.Bool;
                 else if (s.compareTo("real") == 0)
-                        curEnv.put(id, Type.Real);
+                        type = Type.Real;
                 else if (s.compareTo("char") == 0)
-                        curEnv.put(id, Type.Char);
+                        type = Type.Char;
+                else
+                        {if (true) throw new ParseException("Unknow type");}
+                curEnv.put(id, type);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_EQUAL_OPERATOR:
       case 42:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ASSIGNMENT_EQUAL_OPERATOR:
           jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
-          Expression();
+          paraR = Expression();
+                        jjtn000.genInter(0, paraR);
+
+                        if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Char) && (jjtn000.typeRight == Type.Real))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Int) && (jjtn000.typeRight == Type.Real))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
           break;
         case 42:
           jj_consume_token(42);
@@ -211,16 +227,27 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         }
         jj_consume_token(41);
         id = MyID();
+                        jjtn000.setId(id);
                         if (curEnv.contains(id))
                                 {if (true) throw new ParseException("Redifine: "+ id);}
-                        curEnv.put(id, new Type(t.image, false));
+                        curEnv.put(id, type);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ASSIGNMENT_EQUAL_OPERATOR:
         case 42:
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case ASSIGNMENT_EQUAL_OPERATOR:
             jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
-            Expression();
+            paraR = Expression();
+                        jjtn000.genInter(0, paraR);
+
+                        if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Char) && (jjtn000.typeRight == Type.Real))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Int) && (jjtn000.typeRight == Type.Real))
+                                {if (true) throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);}
             break;
           case 42:
             jj_consume_token(42);
@@ -666,11 +693,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case BREAK:
       case CONTINUE:
       case RETURN:
+      case VARIABLE_TYPE:
+      case CONST:
       case IDENTIFIER:
       case 46:
       case 69:
       case 70:
-        Statement();
+        BlockStatement();
         break;
       default:
         jj_la1[22] = jj_gen;
@@ -943,9 +972,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       jj_consume_token(47);
       paraR = Expression();
       jj_consume_token(48);
+                if (jjtn000.typeRight != Type.Bool)
+                        {if (true) throw new ParseException("Error type of ifStatement: " + jjtn000.typeRight.name);}
+                Env savedEnv = curEnv;
+                curEnv = new Env(curEnv);
                 jjtn000.genInter(0, paraR);
       Block();
-                jjtn000.genTailLabel();
+                curEnv = savedEnv;
       label_7:
       while (true) {
         if (jj_2_6(2)) {
@@ -955,20 +988,34 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         }
         jj_consume_token(ELSE);
         jj_consume_token(IF);
+                        jjtn000.genElseLabel();
         jj_consume_token(47);
-        Expression();
+        paraR = Expression();
         jj_consume_token(48);
+                        jjtn000.genInter(0, paraR);
+                        if (jjtn000.typeRight != Type.Bool)
+                                {if (true) throw new ParseException("Error type of ifStatement: " + jjtn000.typeRight.name);}
+                        savedEnv = curEnv;
+                        curEnv = new Env(curEnv);
         Block();
+                        curEnv = savedEnv;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ELSE:
         jj_consume_token(ELSE);
+                        jjtn000.genElseLabel();
+                        savedEnv = curEnv;
+                        curEnv = new Env(curEnv);
         Block();
+                        curEnv = savedEnv;
         break;
       default:
         jj_la1[28] = jj_gen;
         ;
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.genTailLabel();
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1002,11 +1049,16 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       jj_consume_token(47);
       paraR = Expression();
       jj_consume_token(48);
+                if (jjtn000.typeRight != Type.Bool)
+                        {if (true) throw new ParseException("Error type of whileStatement: " + jjtn000.typeRight.name);}
+                Env savedEnv = curEnv;
+                curEnv = new Env(curEnv);
                 jjtn000.genInter(0, paraR);
       Block();
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 jjtn000.writeTailLabel();
+                curEnv = savedEnv;
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1035,23 +1087,52 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);int paraL, paraR;
         String id;
+        Token t = null;
     try {
       jj_consume_token(FOR);
-                jjtn000.writeHeadLabel();
+                //jjtThis.writeHeadLabel();
+                Env savedEnv = curEnv;
+                curEnv = new Env(curEnv);
       jj_consume_token(47);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VARIABLE_TYPE:
-        jj_consume_token(VARIABLE_TYPE);
+        t = jj_consume_token(VARIABLE_TYPE);
         break;
       default:
         jj_la1[29] = jj_gen;
         ;
       }
       id = MyID();
+                        Type type;
+                        if (t != null)
+                        {
+                                String s = t.image;
+                                if (s.compareTo("int") == 0)
+                                        type = Type.Int;
+                                else if (s.compareTo("char") == 0)
+                                        type = Type.Char;
+                                else
+                                        {if (true) throw new ParseException("Invalid type in forStatement");}
+                                curEnv.put(id, type);
+                        }
+                        else
+                        {
+                                type = curEnv.get(id);
+                                if (type == null)
+                                        {if (true) throw new ParseException("Undifine id in forStatement: " + id);}
+                        }
       jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
       paraL = Expression();
+                        if ((type == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
+                                {if (true) throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Char) && (jjtn000.typeRight != Type.Char))
+                                {if (true) throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);}
       jj_consume_token(TO);
       paraR = Expression();
+                        if ((type == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
+                                {if (true) throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);}
+                        if ((type == Type.Char) && (jjtn000.typeRight != Type.Char))
+                                {if (true) throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);}
       jj_consume_token(48);
                 jjtn000.genInter(id, paraL, paraR);
       Block();
@@ -2550,6 +2631,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     finally { jj_save(6, xla); }
   }
 
+<<<<<<< HEAD
   private boolean jj_3R_71() {
     if (jj_scan_token(47)) return true;
     if (jj_3R_73()) return true;
@@ -2626,6 +2708,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+=======
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
   private boolean jj_3R_69() {
     if (jj_scan_token(CHARACTER_LITERAL)) return true;
     return false;
@@ -2727,6 +2811,15 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+<<<<<<< HEAD
+=======
+  private boolean jj_3_6() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
   private boolean jj_3R_54() {
     if (jj_3R_56()) return true;
     Token xsp;
@@ -2766,11 +2859,14 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+<<<<<<< HEAD
   private boolean jj_3_2() {
     if (jj_3R_20()) return true;
     return false;
   }
 
+=======
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
   private boolean jj_3R_64() {
     if (jj_scan_token(72)) return true;
     if (jj_3R_56()) return true;
@@ -2789,6 +2885,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+<<<<<<< HEAD
   private boolean jj_3R_40() {
     if (jj_3R_42()) return true;
     Token xsp;
@@ -2799,6 +2896,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+=======
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
   private boolean jj_3R_55() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2902,6 +3001,11 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+  private boolean jj_3_2() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
   private boolean jj_3R_28() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2935,6 +3039,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
   private boolean jj_3R_27() {
     if (jj_scan_token(IDENTIFIER)) return true;
+<<<<<<< HEAD
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_31()) jj_scanpos = xsp;
@@ -3018,6 +3123,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   }
 
   private boolean jj_3R_53() {
+=======
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(62)) {
@@ -3033,19 +3140,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_20() {
+  private boolean jj_3R_25() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(18)) jj_scanpos = xsp;
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_3R_24()) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) return true;
     }
-    if (jj_scan_token(46)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_29() {
+    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
     return false;
   }
 
@@ -3061,6 +3167,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   private boolean jj_3_5() {
     if (jj_3R_23()) return true;
     if (jj_scan_token(46)) return true;
+<<<<<<< HEAD
     return false;
   }
 
@@ -3076,9 +3183,135 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+=======
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_3R_22()) return true;
+    if (jj_scan_token(46)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_47() {
+    if (jj_scan_token(55)) return true;
+    if (jj_3R_46()) return true;
+    return false;
+  }
+
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
   private boolean jj_3_3() {
     if (jj_3R_21()) return true;
     if (jj_scan_token(46)) return true;
+    return false;
+  }
+
+<<<<<<< HEAD
+  private boolean jj_3R_37() {
+    if (jj_scan_token(50)) return true;
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(49)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_44() {
+    if (jj_3R_46()) return true;
+=======
+  private boolean jj_3R_38() {
+    if (jj_3R_40()) return true;
+>>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_47()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_39() {
+    if (jj_scan_token(51)) return true;
+    if (jj_3R_38()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(23)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(17)) return true;
+    }
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(47)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(69)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(70)) return true;
+    }
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_75() {
+    if (jj_3R_28()) return true;
+    if (jj_scan_token(48)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_73() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_75()) {
+    jj_scanpos = xsp;
+    if (jj_3R_76()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_77() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_78()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(62)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(63)) return true;
+    }
+    if (jj_3R_52()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_72() {
+    if (jj_3R_74()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_74() {
+    if (jj_scan_token(47)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_77()) jj_scanpos = xsp;
+    if (jj_scan_token(48)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_60() {
+    if (jj_scan_token(65)) return true;
+    if (jj_3R_56()) return true;
     return false;
   }
 
@@ -3106,6 +3339,91 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+  private boolean jj_3R_71() {
+    if (jj_scan_token(47)) return true;
+    if (jj_3R_73()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_59() {
+    if (jj_scan_token(64)) return true;
+    if (jj_3R_56()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_50() {
+    if (jj_3R_52()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_53()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(18)) jj_scanpos = xsp;
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_3R_24()) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(46)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_70() {
+    if (jj_3R_27()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_72()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_58() {
+    if (jj_3R_61()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_58()) {
+    jj_scanpos = xsp;
+    if (jj_3R_59()) {
+    jj_scanpos = xsp;
+    if (jj_3R_60()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_36() {
+    if (jj_3R_38()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_39()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_45() {
+    if (jj_scan_token(54)) return true;
+    if (jj_3R_44()) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public Eg2TokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -3127,7 +3445,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,0x868000,0x0,0x40000,0x1000000,0x0,0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0x60000,0x820000,0x60000,0x0,0x40000,0x1000000,0x0,0x0,0x0,0x17a80,0x77a80,0x77a80,0x17a80,0x0,0x16000,0x100,0x20000,0x17000000,0x17000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x17000000,0x0,0x0,0x17000000,0x0,0x17000000,0x0,0x17000000,0x17020000,0x0,0x0,};
+      jj_la1_0 = new int[] {0x8000,0x868000,0x0,0x40000,0x1000000,0x0,0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0x60000,0x820000,0x60000,0x0,0x40000,0x1000000,0x0,0x0,0x0,0x77a80,0x77a80,0x77a80,0x17a80,0x0,0x16000,0x100,0x20000,0x17000000,0x17000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x17000000,0x0,0x0,0x17000000,0x0,0x17000000,0x0,0x17000000,0x17020000,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x200,0x0,0x0,0x80,0x480,0x480,0x200,0x0,0x80,0x480,0x480,0x0,0x0,0x0,0x200,0x0,0x0,0x80,0x480,0x480,0x5020,0x4020,0x4020,0x4020,0x4000,0x0,0x0,0x0,0x8020,0x8020,0x180,0x40000,0x80000,0x100000,0x200000,0x400000,0x800000,0x3000000,0x3000000,0x3c000000,0x3c000000,0xc0000000,0xc0000000,0x0,0x0,0x0,0x0,0x8020,0x0,0x0,0x8020,0x8000,0x8020,0x200,0x8020,0x8020,0x400,0x400,};

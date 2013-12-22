@@ -31,13 +31,13 @@ class ASTEqualityExpression extends SimpleNode {
 				+ " goto @L" + Integer.toString(genLabel())
 				+ "\ngoto @L" + Integer.toString(genLabel());
 		content += "\n@L"
-				+ Integer.toString(genOldLabel())
+				+ Integer.toString(label - 1)
 				+ ": @t" + Integer.toString(genPara())
 				+ " = 1\n"
 				+ "@L"
-				+ Integer.toString(genOldLabel())
+				+ Integer.toString(label)
 				+ ": @t" + Integer.toString(para)
-				+ " = 0";
+				+ " = 0\n";
 		writeInter();
 		return para;
 	}
