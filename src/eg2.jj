@@ -39,7 +39,6 @@ PARSER_BEGIN(Eg2)
 /** An Arithmetic Grammar. */
 //package Parser;
 import symbols.*;
-import java.util.ArrayList;
 
 public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
@@ -47,7 +46,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants/*@egen*/
 
 /*@egen*/
 	Env curEnv = null;       // current symbol table
-	FuncTable funcTable = new FuncTable();
 	/** Main entry point. */
 	public static void main(String args[])
 	{
@@ -246,7 +244,7 @@ void UniversalDeclarator() :
 /*@egen*/
 	Token t = null;
 	String id;
-	Type type, type1;
+	Type type;
 	int paraR;
 }
 {/*@bgen(jjtree) UniversalDeclarator */
@@ -269,7 +267,7 @@ void UniversalDeclarator() :
 			type = Type.Char;
 		else
 			throw new ParseException("Unknow type");
-		type1 = type;
+		curEnv.put(id, type);
 	}	
 	(
 		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
@@ -285,21 +283,15 @@ void UniversalDeclarator() :
 			if ((type == Type.Int) && (jjtn000.typeRight == Type.Real))
 				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);		}
 	|
-		"[" (<INTEGER_LITERAL >)? "]"
-		{
-			type1.isArray = true;		}
-		(<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
+		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
-	{
-		curEnv.put(id, type1);	}
 	(
 		"," id = MyID()
 		{
 		  	jjtn000.setId(id);
 			if (curEnv.contains(id))
 				throw new ParseException("Redifine: "+ id);
-			type1 = type;
-		}
+			curEnv.put(id, type);		}
 		(
 		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
 		{
@@ -315,15 +307,8 @@ void UniversalDeclarator() :
 				throw new ParseException("Error type of op: = /" + type.name + " " + jjtn000.typeRight.name);
 		}
 		|
-			"[" (<INTEGER_LITERAL >)? "]"
-			{
-				type1.isArray = true;
-			}
-			(<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
+			"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 		)?
-		{
-			curEnv.put(id, type1);
-		}
 	)*
 	";"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
@@ -508,7 +493,6 @@ void FunctionDeclarator() :
 /*@egen*/
 	Token t;
 	String id;
-	ArrayList<Type> paras = null;
 }
 {/*@bgen(jjtree) FunctionDeclarator */
         try {
@@ -521,29 +505,13 @@ void FunctionDeclarator() :
 		jjtn000.genInter();
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, new Type(t.image, true));				
+		curEnv.put(id, new Type(t.image, true));
 		Env savedEnv = curEnv;
 		curEnv = new Env(curEnv);
-		String s = t.image;
-		curEnv.setReturned(false);
-		if (s.compareTo("int") == 0)
-			curEnv.setFunType(Type.Int);
-		else if (s.compareTo("bool") == 0)
-			curEnv.setFunType(Type.Bool);
-		else if (s.compareTo("real") == 0)
-			curEnv.setFunType(Type.Real);
-		else if (s.compareTo("char") == 0)
-			curEnv.setFunType(Type.Char);
-		else if (s.compareTo("void") == 0)
-		{			curEnv.setReturned(true);
-			curEnv.setFunType(Type.Void);
-		}
-		else
-			throw new ParseException("Unknown type of function"+ id);
 	}
-	"(" (paras = FunctionParameterList())? ")" 
+	"(" (FunctionParameterList())? ")" 
 	{
-		funcTable.put(id, new Function(id, paras));		jjtn000.writeReturn();
+		jjtn000.writeReturn();
 	}
 	FunctionBody()/*@bgen(jjtree)*/
         {
@@ -551,9 +519,7 @@ void FunctionDeclarator() :
           jjtc000 = false;
         }
 /*@egen*/
-	{		
-		if (!curEnv.isReturned())
-			throw new ParseException("Function "+ id + "() not return");
+	{
 		curEnv = savedEnv;	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -578,33 +544,15 @@ void FunctionDeclarator() :
 }
 
 /** function parameter list. */
-ArrayList<Type> FunctionParameterList() :
-{/*@bgen(jjtree) FunctionParameterList */
-        ASTFunctionParameterList jjtn000 = new ASTFunctionParameterList(JJTFUNCTIONPARAMETERLIST);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	Type type;
-	ArrayList<Type> paras = new ArrayList<Type>();
-}
+void FunctionParameterList() : {/*@bgen(jjtree) FunctionParameterList */
+  ASTFunctionParameterList jjtn000 = new ASTFunctionParameterList(JJTFUNCTIONPARAMETERLIST);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
 {/*@bgen(jjtree) FunctionParameterList */
         try {
 /*@egen*/
-	type = FunctionParameter()
-	{
-		paras.add(type);	}
-	(
-		"," type = FunctionParameter()
-		{
-			paras.add(type);		}
-	)*/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{
-		return paras;	}/*@bgen(jjtree)*/
+	FunctionParameter() ("," FunctionParameter())*/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -628,7 +576,7 @@ ArrayList<Type> FunctionParameterList() :
 }
 
 /** function parameter. */
-Type FunctionParameter() :
+void FunctionParameter() :
 {/*@bgen(jjtree) FunctionParameter */
         ASTFunctionParameter jjtn000 = new ASTFunctionParameter(JJTFUNCTIONPARAMETER);
         boolean jjtc000 = true;
@@ -636,7 +584,6 @@ Type FunctionParameter() :
 /*@egen*/
 	Token t;
 	String id;
-	Type type;
 }
 {/*@bgen(jjtree) FunctionParameter */
         try {
@@ -648,30 +595,12 @@ Type FunctionParameter() :
 		jjtn000.genInter();
 		
 		if (curEnv.contains(id))
-			throw new ParseException("Redifine: "+ id);		
-		String s = t.image;
-		if (s.compareTo("int") == 0)
-			type = Type.Int;
-		else if (s.compareTo("bool") == 0)
-			type = Type.Int;
-		else if (s.compareTo("real") == 0)
-			type = Type.Int;
-		else if (s.compareTo("char") == 0)
-			type = Type.Int;
-		else
-			throw new ParseException("Invalid type function parameters: "+ id);			
-		curEnv.put(id, type);
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, new Type(t.image, false));
 	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{
-		return type;	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -866,22 +795,18 @@ void Statement() : {/*@bgen(jjtree) Statement */
 
 
 /** statement without trailing substatement(simple statement). */
-void SimpleStatement() :
-{/*@bgen(jjtree) SimpleStatement */
-        ASTSimpleStatement jjtn000 = new ASTSimpleStatement(JJTSIMPLESTATEMENT);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	String id;
-}
+void SimpleStatement() : {/*@bgen(jjtree) SimpleStatement */
+  ASTSimpleStatement jjtn000 = new ASTSimpleStatement(JJTSIMPLESTATEMENT);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
 {/*@bgen(jjtree) SimpleStatement */
         try {
 /*@egen*/
 	EmptyStatement()
-	| LOOKAHEAD(10) (AssignmentExpression() ";")
-	| LOOKAHEAD(3) (PostIncDecExpression() ";")
-	| LOOKAHEAD(3) (PreIncDecExpression() ";")	
-	| LOOKAHEAD(2) (id = MyID() FunctionInvoke(id) ";")
+	| LOOKAHEAD(10) (PostIncDecExpression() ";")
+	| LOOKAHEAD(10) (PreIncDecExpression() ";")
+	| LOOKAHEAD(10) (AssignmentExpression() ";")	
 	| BreakStatement()
 	| ContinueStatement()
 	| ReturnStatement()/*@bgen(jjtree)*/
@@ -1101,17 +1026,14 @@ void ForStatement() :
 			{
 				type = curEnv.get(id);
 				if (type == null)
-					throw new ParseException("Undifine id in forStatement: " + id);
-				else if (type.isFunc)
-					throw new ParseException("Error type in forStatement");			}		}
+					throw new ParseException("Undifine id in forStatement: " + id);			}		}
 		<ASSIGNMENT_EQUAL_OPERATOR >
 		paraL = Expression()
 		{
 			if ((type == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
 				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);
 			if ((type == Type.Char) && (jjtn000.typeRight != Type.Char))
-				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);
-						}
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtn000.typeRight.name);		}
 		<TO >
 		paraR = Expression()
 		{
@@ -1196,6 +1118,13 @@ void BreakStatement() : {/*@bgen(jjtree) BreakStatement */
         try {
 /*@egen*/
 	<BREAK > ";"/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.genInter();	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1214,6 +1143,14 @@ void ContinueStatement() : {/*@bgen(jjtree) ContinueStatement */
         try {
 /*@egen*/
 	<CONTINUE > ";"/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.genInter();
+	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1230,7 +1167,6 @@ void ReturnStatement() :
         jjtree.openNodeScope(jjtn000);
 /*@egen*/
 	int paraL;
-	Type funcType = curEnv.getFunType();
 }
 {/*@bgen(jjtree) ReturnStatement */
         try {
@@ -1239,18 +1175,8 @@ void ReturnStatement() :
 	(
 		paraL = Expression()
 		{
-			if (funcType == Type.Void)
-				throw new ParseException("Error type of return");
-			else if ((funcType == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);
-			else if ((funcType == Type.Real) && (!Type.numeric(jjtn000.typeRight)))
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);
-			else if (funcType != jjtn000.typeRight)
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);
-			curEnv.setReturned(true);
-			jjtn000.genInter(paraL, 0);
-		}
-	)?
+			jjtn000.genInter(paraL, 0);		}
+	)? 
 	";"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -1272,7 +1198,6 @@ void ReturnStatement() :
           }
         }
 /*@egen*/
-	
 }
 
 /** comment statement. */
@@ -1359,42 +1284,18 @@ int AssignmentExpression() :
 {/*@bgen(jjtree) AssignmentExpression */
         try {
 /*@egen*/
-	lhs = LeftSide()
-	{
-		Type type;
-	  	int i = lhs.indexOf("[");		  	
-	  	String s = lhs;
-	  	if (i != -1)
-	  		s = lhs.substring(0, i);
-	  	type = curEnv.get(s); 
-		if (type == null)
-			throw new ParseException("Undifine : "+ lhs);
-		if (type.isFunc)
-			throw new ParseException("Invalid parameter: "+ lhs);
-		if (type.isArray)
-		{
-			if (i == -1)
-				throw new ParseException("Invalid access to array: "+ lhs);
-			s = type.name;
-			if (s.compareTo("int") == 0)
-				type = Type.Int;
-			else if (s.compareTo("bool") == 0)
-				type = Type.Int;
-			else if (s.compareTo("real") == 0)
-				type = Type.Int;
-			else if (s.compareTo("char") == 0)
-				type = Type.Int;
-			else
-				throw new ParseException("Invalid type of array: "+ lhs);
-		}
-	}	
-	(op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()/*@bgen(jjtree)*/
+	lhs = LeftSide() (op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()/*@bgen(jjtree)*/
         {
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
         }
 /*@egen*/
 	{
+		Type type = curEnv.get(lhs);
+		if (type == null)
+			throw new ParseException("Undifine: "+ lhs);
+		if (type.isFunc)
+			throw new ParseException("Invalid parameter: "+ lhs);
 		if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
 			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtn000.typeRight.name);
 		if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
@@ -1487,7 +1388,8 @@ int ConditionalOrExpression() :
 		typeLeft = jjtn000.typeRight;
 	}
 	(
-		"||" paraR = ConditionalAndExpression()		
+		"||" paraR = ConditionalAndExpression()
+		
 		{
 			if ((typeLeft != Type.Bool) || (jjtn000.typeRight != Type.Bool))
 				throw new ParseException("Error type of op: || / " + typeLeft.name + " " + jjtn000.typeRight.name);
@@ -2259,8 +2161,6 @@ int Primary() :
 /*@egen*/
 	Token t1;
 	String lhs;
-	boolean isFuncInvoke = false;
-	int paraR;
 }
 {/*@bgen(jjtree) Primary */
         try {
@@ -2309,62 +2209,23 @@ int Primary() :
 		jjtn000.typeRight = Type.Char;
 		return jjtn000.genInter();
 	}	
-	| lhs = LeftSide() (isFuncInvoke = FunctionInvoke(lhs))?/*@bgen(jjtree)*/
+	| lhs = LeftSide() (FunctionInvoke())?/*@bgen(jjtree)*/
         {
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
         }
 /*@egen*/
 	{
-		if(isFuncInvoke)
-		{
-			Type type = curEnv.getFuncType(lhs);
-			if (type == null)
-				throw new ParseException("Undifine function: "+ lhs);
-			jjtn000.typeRight = type;
-			jjtn000.setName(lhs);
-			return 0;		}
-		else
-		{
-		  	Type type;
-		  	int i = lhs.indexOf("[");		  	
-		  	String s = lhs;
-		  	if (i != -1)
-		  		s = lhs.substring(0, i);
-		  	type = curEnv.get(s); 
-			if (type == null)
-				throw new ParseException("Undifine : "+ lhs);
-			if (type.isFunc)
-				throw new ParseException("Invalid parameter: "+ lhs);
-			if (type.isArray)
-			{
-				if (i == -1)
-					throw new ParseException("Invalid access to array: "+ lhs);
-				s = type.name;
-				if (s.compareTo("int") == 0)
-					type = Type.Int;
-				else if (s.compareTo("bool") == 0)
-					type = Type.Int;
-				else if (s.compareTo("real") == 0)
-					type = Type.Int;
-				else if (s.compareTo("char") == 0)
-					type = Type.Int;
-				else
-					throw new ParseException("Invalid type of array: "+ lhs);
-			}
-			jjtn000.typeRight = type;
-			jjtn000.setName(lhs);
-			return jjtn000.genInter();
-		}
+		Type type = curEnv.get(lhs); 
+		if (type == null)
+			throw new ParseException("Undifine: "+ lhs);
+		if (type.isFunc)
+			throw new ParseException("Invalid parameter: "+ lhs);
+		jjtn000.typeRight = type;
+		jjtn000.setName(lhs);
+		return jjtn000.genInter();		
 	}
-	| "(" paraR = Primary2()/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{
-		return paraR;	}/*@bgen(jjtree)*/
+	| "(" Primary2()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -2388,49 +2249,15 @@ int Primary() :
 }
 
 /** FunctionInvoke. */
-boolean FunctionInvoke(String id) :
-{/*@bgen(jjtree) FunctionInvoke */
-        ASTFunctionInvoke jjtn000 = new ASTFunctionInvoke(JJTFUNCTIONINVOKE);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	ArrayList<Type> paras = funcTable.get(id).getParas();
-	ArrayList<Type> temParas = new ArrayList<Type>();
-}
+void FunctionInvoke() : {/*@bgen(jjtree) FunctionInvoke */
+  ASTFunctionInvoke jjtn000 = new ASTFunctionInvoke(JJTFUNCTIONINVOKE);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
 {/*@bgen(jjtree) FunctionInvoke */
         try {
 /*@egen*/
-	"("
-	(
-		Expression()
-		{
-			temParas.add(jjtn000.typeRight);		}
-		(
-			"," Expression()
-			{
-				temParas.add(jjtn000.typeRight);			}
-		)*
-	)?
-	")"/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{
-		if(paras.size() != temParas.size())
-			throw new ParseException("Unmatched size of array parameters: "+ id);
-		for(int i = 0; i < paras.size(); i++)
-		{
-			Type type1 = paras.get(i);
-			Type type2 = temParas.get(i);
-			if (((type1 == Type.Bool) && (type2 != Type.Bool)) || ((type1 != Type.Bool) && (type2 == Type.Bool)))
-				throw new ParseException("Unmatched type in function parameters: " + id);
-			if ((type1 == Type.Char) && ((type2 != Type.Real) || (type2 != Type.Int)))
-				throw new ParseException("Unmatched type in function parameters: " + id);
-			if ((type1 == Type.Int) && (type2 == Type.Real))
-				throw new ParseException("Unmatched type in function parameters: " + id);		}
-		return true;	}/*@bgen(jjtree)*/
+	"(" (Expression() ("," Expression())*)?	")"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -2455,24 +2282,15 @@ boolean FunctionInvoke(String id) :
 
 
 /** primary2. */
-int Primary2() :
-{/*@bgen(jjtree) Primary2 */
-        ASTPrimary2 jjtn000 = new ASTPrimary2(JJTPRIMARY2);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	int paraR;
-}
+void Primary2() : {/*@bgen(jjtree) Primary2 */
+  ASTPrimary2 jjtn000 = new ASTPrimary2(JJTPRIMARY2);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
 {/*@bgen(jjtree) Primary2 */
         try {
 /*@egen*/
-	paraR = Expression() ")"/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{		return paraR;	}
+	Expression() ")"
 	| <VARIABLE_TYPE > ")" SimpleUnaryExpression()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -2504,42 +2322,23 @@ String LeftSide() :
 /*@egen*/
 	Token t1;
 	Token t2;
-	String ret;
-	int paraR;
 }
 {/*@bgen(jjtree) LeftSide */
         try {
 /*@egen*/
-	(t1 = <IDENTIFIER>)
+	t1 = <IDENTIFIER>
 	{
-		ret = t1.image;
-		jjtn000.setName(ret);		
+		jjtn000.setName(t1.image);
+		return t1.image;
 	}
-	(	  
-		("." t2 = <IDENTIFIER >)
+	(
+		"." t2 = <IDENTIFIER >
 		{
 			jjtn000.setName(t1.image + "." + t2.image);
-		}		
+		}
 		|
-		(
-			"["
-			paraR = Expression()
-			{
-				if ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char))
-					throw new ParseException("Error type of index when referring array: "+ t1.image);
-				ret = t1.image + "[@t" + paraR + "]";
-				jjtn000.setName(ret);
-			}
-			"]"
-		)
+		"[" Expression() "]"
 	)?/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{
-		return ret;	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);

@@ -13,7 +13,9 @@ class ASTContinueStatement extends SimpleNode {
   }
 
   public int genInter() throws IOException {
-	  content = "got L" + Integer.toString(continueLabel)
+	  int label = continueLabel.get(breakLabel.size() - 1);
+	  //continueLabel.remove(breakLabel.size() - 1);
+	  content = "goto @L" + Integer.toString(label)
 			  + "\n";
 	  writeInter();
 	  return para;

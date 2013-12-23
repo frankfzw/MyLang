@@ -1,5 +1,7 @@
-int a(int q)
+int a()
 {
-	bool t = a('a');
-	return false;
+	int c = 5;
+	int a = 6;
+	int b = a + c;
+	return b;
 }

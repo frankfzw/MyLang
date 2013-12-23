@@ -29,8 +29,6 @@ public class Type{
 		   width = 8;
 	   else if (s.compareTo("char") == 0)
 		   width = 1;
-	   else if (s.compareTo("void") == 0)
-		   width = 0;
    }
 
    public static boolean numeric(Type p) {

@@ -38,12 +38,10 @@ PARSER_BEGIN(Eg2)
 /** An Arithmetic Grammar. */
 //package Parser;
 import symbols.*;
-import java.util.ArrayList;
 
 public class Eg2
 {
 	Env curEnv = null;       // current symbol table
-	FuncTable funcTable = new FuncTable();
 	/** Main entry point. */
 	public static void main(String args[])
 	{
@@ -181,7 +179,7 @@ void UniversalDeclarator() :
 {
 	Token t = null;
 	String id;
-	Type type, type1;
+	Type type;
 	int paraR;
 }
 {
@@ -202,7 +200,7 @@ void UniversalDeclarator() :
 			type = Type.Char;
 		else
 			throw new ParseException("Unknow type");
-		type1 = type;
+		curEnv.put(id, type);
 	}	
 	(
 		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
@@ -218,21 +216,15 @@ void UniversalDeclarator() :
 			if ((type == Type.Int) && (jjtThis.typeRight == Type.Real))
 				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);		}
 	|
-		"[" (<INTEGER_LITERAL >)? "]"
-		{
-			type1.isArray = true;		}
-		(<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
+		"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
-	{
-		curEnv.put(id, type1);	}
 	(
 		"," id = MyID()
 		{
 		  	jjtThis.setId(id);
 			if (curEnv.contains(id))
 				throw new ParseException("Redifine: "+ id);
-			type1 = type;
-		}
+			curEnv.put(id, type);		}
 		(
 		<ASSIGNMENT_EQUAL_OPERATOR > paraR = Expression()
 		{
@@ -248,15 +240,8 @@ void UniversalDeclarator() :
 				throw new ParseException("Error type of op: = /" + type.name + " " + jjtThis.typeRight.name);
 		}
 		|
-			"[" (<INTEGER_LITERAL >)? "]"
-			{
-				type1.isArray = true;
-			}
-			(<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
+			"[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 		)?
-		{
-			curEnv.put(id, type1);
-		}
 	)*
 	";"
 }
@@ -308,7 +293,6 @@ void FunctionDeclarator() :
 {
 	Token t;
 	String id;
-	ArrayList<Type> paras = null;
 }
 {
 	(t = <VOID > | t = <VARIABLE_TYPE >)
@@ -319,62 +303,30 @@ void FunctionDeclarator() :
 		jjtThis.genInter();
 		if (curEnv.contains(id))
 			throw new ParseException("Redifine: "+ id);
-		curEnv.put(id, new Type(t.image, true));				
+		curEnv.put(id, new Type(t.image, true));
 		Env savedEnv = curEnv;
 		curEnv = new Env(curEnv);
-		String s = t.image;
-		curEnv.setReturned(false);
-		if (s.compareTo("int") == 0)
-			curEnv.setFunType(Type.Int);
-		else if (s.compareTo("bool") == 0)
-			curEnv.setFunType(Type.Bool);
-		else if (s.compareTo("real") == 0)
-			curEnv.setFunType(Type.Real);
-		else if (s.compareTo("char") == 0)
-			curEnv.setFunType(Type.Char);
-		else if (s.compareTo("void") == 0)
-		{			curEnv.setReturned(true);
-			curEnv.setFunType(Type.Void);
-		}
-		else
-			throw new ParseException("Unknown type of function"+ id);
 	}
-	"(" (paras = FunctionParameterList())? ")" 
+	"(" (FunctionParameterList())? ")" 
 	{
-		funcTable.put(id, new Function(id, paras));		jjtThis.writeReturn();
+		jjtThis.writeReturn();
 	}
 	FunctionBody()
-	{		
-		if (!curEnv.isReturned())
-			throw new ParseException("Function "+ id + "() not return");
+	{
 		curEnv = savedEnv;	}
 }
 
 /** function parameter list. */
-ArrayList<Type> FunctionParameterList() :
+void FunctionParameterList() : {}
 {
-	Type type;
-	ArrayList<Type> paras = new ArrayList<Type>();
-}
-{
-	type = FunctionParameter()
-	{
-		paras.add(type);	}
-	(
-		"," type = FunctionParameter()
-		{
-			paras.add(type);		}
-	)*
-	{
-		return paras;	}
+	FunctionParameter() ("," FunctionParameter())*
 }
 
 /** function parameter. */
-Type FunctionParameter() :
+void FunctionParameter() :
 {
 	Token t;
 	String id;
-	Type type;
 }
 {
 	(<CONST >)? t = <VARIABLE_TYPE > id = MyID()
@@ -384,25 +336,12 @@ Type FunctionParameter() :
 		jjtThis.genInter();
 		
 		if (curEnv.contains(id))
-			throw new ParseException("Redifine: "+ id);		
-		String s = t.image;
-		if (s.compareTo("int") == 0)
-			type = Type.Int;
-		else if (s.compareTo("bool") == 0)
-			type = Type.Int;
-		else if (s.compareTo("real") == 0)
-			type = Type.Int;
-		else if (s.compareTo("char") == 0)
-			type = Type.Int;
-		else
-			throw new ParseException("Invalid type function parameters: "+ id);			
-		curEnv.put(id, type);
+			throw new ParseException("Redifine: "+ id);
+		curEnv.put(id, new Type(t.image, false));
 	}
 	(	  <ASSIGNMENT_EQUAL_OPERATOR > Expression()
 	  | "[" (<INTEGER_LITERAL >)? "]" (<ASSIGNMENT_EQUAL_OPERATOR > "{" ArrayInitializer() "}")?
 	)?
-	{
-		return type;	}
 }
 
 /** function body. */
@@ -447,16 +386,12 @@ void Statement() : {}
 
 
 /** statement without trailing substatement(simple statement). */
-void SimpleStatement() :
-{
-	String id;
-}
+void SimpleStatement() : {}
 {
 	EmptyStatement()
-	| LOOKAHEAD(10) (AssignmentExpression() ";")
-	| LOOKAHEAD(3) (PostIncDecExpression() ";")
-	| LOOKAHEAD(3) (PreIncDecExpression() ";")	
-	| LOOKAHEAD(2) (id = MyID() FunctionInvoke(id) ";")
+	| LOOKAHEAD(10) (PostIncDecExpression() ";")
+	| LOOKAHEAD(10) (PreIncDecExpression() ";")
+	| LOOKAHEAD(10) (AssignmentExpression() ";")	
 	| BreakStatement()
 	| ContinueStatement()
 	| ReturnStatement()
@@ -576,17 +511,14 @@ void ForStatement() :
 			{
 				type = curEnv.get(id);
 				if (type == null)
-					throw new ParseException("Undifine id in forStatement: " + id);
-				else if (type.isFunc)
-					throw new ParseException("Error type in forStatement");			}		}
+					throw new ParseException("Undifine id in forStatement: " + id);			}		}
 		<ASSIGNMENT_EQUAL_OPERATOR >
 		paraL = Expression()
 		{
 			if ((type == Type.Int) && ((jjtThis.typeRight != Type.Int) && (jjtThis.typeRight != Type.Char)))
 				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);
 			if ((type == Type.Char) && (jjtThis.typeRight != Type.Char))
-				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);
-						}
+				throw new ParseException("Error type in forStatement: / " + type.name + " " + jjtThis.typeRight.name);		}
 		<TO >
 		paraR = Expression()
 		{
@@ -614,39 +546,32 @@ void ForeachStatement() : {}
 void BreakStatement() : {}
 {
 	<BREAK > ";"
+	{
+		jjtThis.genInter();	}
 }
 
 /** continue statement. */
 void ContinueStatement() : {}
 {
 	<CONTINUE > ";"
+	{
+		jjtThis.genInter();
+	}
 }
 
 /** return statement. */
 void ReturnStatement() : 
 {
 	int paraL;
-	Type funcType = curEnv.getFunType();
 }
 {
 	<RETURN >
 	(
 		paraL = Expression()
 		{
-			if (funcType == Type.Void)
-				throw new ParseException("Error type of return");
-			else if ((funcType == Type.Int) && ((jjtThis.typeRight != Type.Int) && (jjtThis.typeRight != Type.Char)))
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtThis.typeRight.name);
-			else if ((funcType == Type.Real) && (!Type.numeric(jjtThis.typeRight)))
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtThis.typeRight.name);
-			else if (funcType != jjtThis.typeRight)
-				throw new ParseException("Error type of return /" + funcType.name + " " + jjtThis.typeRight.name);
-			curEnv.setReturned(true);
-			jjtThis.genInter(paraL, 0);
-		}
-	)?
+			jjtThis.genInter(paraL, 0);		}
+	)? 
 	";"
-	
 }
 
 /** comment statement. */
@@ -679,37 +604,13 @@ int AssignmentExpression() :
 	int paraR;
 }
 {
-	lhs = LeftSide()
+	lhs = LeftSide() (op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()
 	{
-		Type type;
-	  	int i = lhs.indexOf("[");		  	
-	  	String s = lhs;
-	  	if (i != -1)
-	  		s = lhs.substring(0, i);
-	  	type = curEnv.get(s); 
+		Type type = curEnv.get(lhs);
 		if (type == null)
-			throw new ParseException("Undifine : "+ lhs);
+			throw new ParseException("Undifine: "+ lhs);
 		if (type.isFunc)
 			throw new ParseException("Invalid parameter: "+ lhs);
-		if (type.isArray)
-		{
-			if (i == -1)
-				throw new ParseException("Invalid access to array: "+ lhs);
-			s = type.name;
-			if (s.compareTo("int") == 0)
-				type = Type.Int;
-			else if (s.compareTo("bool") == 0)
-				type = Type.Int;
-			else if (s.compareTo("real") == 0)
-				type = Type.Int;
-			else if (s.compareTo("char") == 0)
-				type = Type.Int;
-			else
-				throw new ParseException("Invalid type of array: "+ lhs);
-		}
-	}	
-	(op = <ASSIGNMENT_OPERATOR > | op = <ASSIGNMENT_EQUAL_OPERATOR >) paraR = Expression()
-	{
 		if ((type == Type.Bool) && (jjtThis.typeRight != Type.Bool))
 			throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtThis.typeRight.name);
 		if ((type != Type.Bool) && (jjtThis.typeRight == Type.Bool))
@@ -745,7 +646,8 @@ int ConditionalOrExpression() :
 		typeLeft = jjtThis.typeRight;
 	}
 	(
-		"||" paraR = ConditionalAndExpression()		
+		"||" paraR = ConditionalAndExpression()
+		
 		{
 			if ((typeLeft != Type.Bool) || (jjtThis.typeRight != Type.Bool))
 				throw new ParseException("Error type of op: || / " + typeLeft.name + " " + jjtThis.typeRight.name);
@@ -1075,8 +977,6 @@ int Primary() :
 {
 	Token t1;
 	String lhs;
-	boolean isFuncInvoke = false;
-	int paraR;
 }
 {
   	t1 = <INTEGER_LITERAL >
@@ -1103,98 +1003,31 @@ int Primary() :
 		jjtThis.typeRight = Type.Char;
 		return jjtThis.genInter();
 	}	
-	| lhs = LeftSide() (isFuncInvoke = FunctionInvoke(lhs))?
+	| lhs = LeftSide() (FunctionInvoke())?
 	{
-		if(isFuncInvoke)
-		{
-			Type type = curEnv.getFuncType(lhs);
-			if (type == null)
-				throw new ParseException("Undifine function: "+ lhs);
-			jjtThis.typeRight = type;
-			jjtThis.setName(lhs);
-			return 0;		}
-		else
-		{
-		  	Type type;
-		  	int i = lhs.indexOf("[");		  	
-		  	String s = lhs;
-		  	if (i != -1)
-		  		s = lhs.substring(0, i);
-		  	type = curEnv.get(s); 
-			if (type == null)
-				throw new ParseException("Undifine : "+ lhs);
-			if (type.isFunc)
-				throw new ParseException("Invalid parameter: "+ lhs);
-			if (type.isArray)
-			{
-				if (i == -1)
-					throw new ParseException("Invalid access to array: "+ lhs);
-				s = type.name;
-				if (s.compareTo("int") == 0)
-					type = Type.Int;
-				else if (s.compareTo("bool") == 0)
-					type = Type.Int;
-				else if (s.compareTo("real") == 0)
-					type = Type.Int;
-				else if (s.compareTo("char") == 0)
-					type = Type.Int;
-				else
-					throw new ParseException("Invalid type of array: "+ lhs);
-			}
-			jjtThis.typeRight = type;
-			jjtThis.setName(lhs);
-			return jjtThis.genInter();
-		}
+		Type type = curEnv.get(lhs); 
+		if (type == null)
+			throw new ParseException("Undifine: "+ lhs);
+		if (type.isFunc)
+			throw new ParseException("Invalid parameter: "+ lhs);
+		jjtThis.typeRight = type;
+		jjtThis.setName(lhs);
+		return jjtThis.genInter();		
 	}
-	| "(" paraR = Primary2()
-	{
-		return paraR;	}
+	| "(" Primary2()
 }
 
 /** FunctionInvoke. */
-boolean FunctionInvoke(String id) :
+void FunctionInvoke() : {}
 {
-	ArrayList<Type> paras = funcTable.get(id).getParas();
-	ArrayList<Type> temParas = new ArrayList<Type>();
-}
-{
-	"("
-	(
-		Expression()
-		{
-			temParas.add(jjtThis.typeRight);		}
-		(
-			"," Expression()
-			{
-				temParas.add(jjtThis.typeRight);			}
-		)*
-	)?
-	")"
-	{
-		if(paras.size() != temParas.size())
-			throw new ParseException("Unmatched size of array parameters: "+ id);
-		for(int i = 0; i < paras.size(); i++)
-		{
-			Type type1 = paras.get(i);
-			Type type2 = temParas.get(i);
-			if (((type1 == Type.Bool) && (type2 != Type.Bool)) || ((type1 != Type.Bool) && (type2 == Type.Bool)))
-				throw new ParseException("Unmatched type in function parameters: " + id);
-			if ((type1 == Type.Char) && ((type2 != Type.Real) || (type2 != Type.Int)))
-				throw new ParseException("Unmatched type in function parameters: " + id);
-			if ((type1 == Type.Int) && (type2 == Type.Real))
-				throw new ParseException("Unmatched type in function parameters: " + id);		}
-		return true;	}
+	"(" (Expression() ("," Expression())*)?	")"
 }
 
 
 /** primary2. */
-int Primary2() :
+void Primary2() : {}
 {
-	int paraR;
-}
-{
-	paraR = Expression() ")"
-	{		return paraR;	}
+	Expression() ")"
 	| <VARIABLE_TYPE > ")" SimpleUnaryExpression() //cast expression}
 
 /** left side. */
@@ -1202,35 +1035,21 @@ String LeftSide() :
 {
 	Token t1;
 	Token t2;
-	String ret;
-	int paraR;
 }
 {
-	(t1 = <IDENTIFIER>)
+	t1 = <IDENTIFIER>
 	{
-		ret = t1.image;
-		jjtThis.setName(ret);		
+		jjtThis.setName(t1.image);
+		return t1.image;
 	}
-	(	  
-		("." t2 = <IDENTIFIER >)
+	(
+		"." t2 = <IDENTIFIER >
 		{
 			jjtThis.setName(t1.image + "." + t2.image);
-		}		
+		}
 		|
-		(
-			"["
-			paraR = Expression()
-			{
-				if ((jjtThis.typeRight != Type.Int) && (jjtThis.typeRight != Type.Char))
-					throw new ParseException("Error type of index when referring array: "+ t1.image);
-				ret = t1.image + "[@t" + paraR + "]";
-				jjtThis.setName(ret);
-			}
-			"]"
-		)
+		"[" Expression() "]"
 	)?
-	{
-		return ret;	}
 }
 
 /** An Identifier. */
