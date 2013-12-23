@@ -546,12 +546,17 @@ void ForeachStatement() : {}
 void BreakStatement() : {}
 {
 	<BREAK > ";"
+	{
+		jjtThis.genInter();	}
 }
 
 /** continue statement. */
 void ContinueStatement() : {}
 {
 	<CONTINUE > ";"
+	{
+		jjtThis.genInter();
+	}
 }
 
 /** return statement. */

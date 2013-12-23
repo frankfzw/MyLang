@@ -669,28 +669,6 @@ void Block() : {/*@bgen(jjtree) Block */
         try {
 /*@egen*/
 	"{" BlockStatements() "}"
-<<<<<<< HEAD
-	| Statement()/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-=======
 	| BlockStatement()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -711,7 +689,6 @@ void Block() : {/*@bgen(jjtree) Block */
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
->>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 }
 
@@ -896,29 +873,6 @@ void IfStatement() :
 		jjtn000.genInter(0, paraR);	}
 	Block()
 	{
-<<<<<<< HEAD
-	 	jjtn000.genTailLabel();	}
-	(LOOKAHEAD(2) <ELSE > <IF > "(" Expression() ")" Block())* (<ELSE > Block())?/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-=======
 	  	curEnv = savedEnv;	 		}
 	(
 		LOOKAHEAD(2) <ELSE > <IF >
@@ -975,7 +929,6 @@ void IfStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
->>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 }
 
@@ -1011,28 +964,6 @@ void WhileStatement() :
 /*@egen*/
 	{
 		jjtn000.writeTailLabel();
-<<<<<<< HEAD
-	}/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-=======
 		curEnv = savedEnv;
 	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
@@ -1054,7 +985,6 @@ void WhileStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
->>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 }
 
@@ -1188,6 +1118,13 @@ void BreakStatement() : {/*@bgen(jjtree) BreakStatement */
         try {
 /*@egen*/
 	<BREAK > ";"/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.genInter();	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1206,6 +1143,14 @@ void ContinueStatement() : {/*@bgen(jjtree) ContinueStatement */
         try {
 /*@egen*/
 	<CONTINUE > ";"/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.genInter();
+	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1216,7 +1161,6 @@ void ContinueStatement() : {/*@bgen(jjtree) ContinueStatement */
 
 /** return statement. */
 void ReturnStatement() : 
-<<<<<<< HEAD
 {/*@bgen(jjtree) ReturnStatement */
         ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
         boolean jjtc000 = true;
@@ -1226,48 +1170,13 @@ void ReturnStatement() :
 }
 {/*@bgen(jjtree) ReturnStatement */
         try {
-=======
-{/*@bgen(jjtree) ReturnStatement */
-        ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	int paraL;
-}
-{/*@bgen(jjtree) ReturnStatement */
-        try {
->>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
 	<RETURN >
 	(
 		paraL = Expression()
 		{
-<<<<<<< HEAD
 			jjtn000.genInter(paraL, 0);		}
-	)? ";"/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-=======
-			jjtn000.genInter(paraL, 0);
-		}
-	)?
+	)? 
 	";"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -1288,9 +1197,7 @@ void ReturnStatement() :
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
->>>>>>> 9580b398b1229a0b1f7d88e5d0175d7b100038d1
 /*@egen*/
-	
 }
 
 /** comment statement. */

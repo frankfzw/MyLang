@@ -1,4 +1,7 @@
 int a()
 {
-	for(a = '1' to '3');
+	int c = 5;
+	int a = 6;
+	int b = a + c;
+	return b;
 }
