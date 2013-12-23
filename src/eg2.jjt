@@ -1148,7 +1148,8 @@ int Primary() :
 	}
 	| "(" paraR = Primary2()
 	{
-		return paraR;	}
+		return paraR;
+		//int a = 1;	}
 }
 
 /** FunctionInvoke. */
