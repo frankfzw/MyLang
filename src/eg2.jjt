@@ -1014,7 +1014,10 @@ int Primary() :
 		jjtThis.setName(lhs);
 		return jjtThis.genInter();		
 	}
-	| "(" Primary2()
+	| "(" paraR = Primary2()
+	{
+		return paraR;
+		//int a = 1;	}
 }
 
 /** FunctionInvoke. */
