@@ -135,7 +135,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t = null;
         String id;
-        Type type;
+        Type type, type1;
         int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -163,7 +163,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                         type = Type.Char;
                 else
                         {if (true) throw new ParseException("Unknow type");}
-                curEnv.put(id, type);
+                type1 = type;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_EQUAL_OPERATOR:
       case 42:
@@ -193,6 +193,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             ;
           }
           jj_consume_token(43);
+                        type1.isArray = true;
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case ASSIGNMENT_EQUAL_OPERATOR:
             jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
@@ -215,6 +216,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         jj_la1[7] = jj_gen;
         ;
       }
+                curEnv.put(id, type1);
       label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -230,7 +232,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                         jjtn000.setId(id);
                         if (curEnv.contains(id))
                                 {if (true) throw new ParseException("Redifine: "+ id);}
-                        curEnv.put(id, type);
+                        type1 = type;
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ASSIGNMENT_EQUAL_OPERATOR:
         case 42:
@@ -260,6 +262,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
               ;
             }
             jj_consume_token(43);
+                                type1.isArray = true;
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case ASSIGNMENT_EQUAL_OPERATOR:
               jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
@@ -282,6 +285,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           jj_la1[12] = jj_gen;
           ;
         }
+                        curEnv.put(id, type1);
       }
       jj_consume_token(46);
     } catch (Throwable jjte000) {
@@ -474,6 +478,23 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                 curEnv.put(id, new Type(t.image, true));
                 Env savedEnv = curEnv;
                 curEnv = new Env(curEnv);
+                String s = t.image;
+                curEnv.setReturned(false);
+                if (s.compareTo("int") == 0)
+                        curEnv.setFunType(Type.Int);
+                else if (s.compareTo("bool") == 0)
+                        curEnv.setFunType(Type.Bool);
+                else if (s.compareTo("real") == 0)
+                        curEnv.setFunType(Type.Real);
+                else if (s.compareTo("char") == 0)
+                        curEnv.setFunType(Type.Char);
+                else if (s.compareTo("void") == 0)
+                {
+                        curEnv.setReturned(true);
+                        curEnv.setFunType(Type.Void);
+                }
+                else
+                        {if (true) throw new ParseException("Unknown type of function"+ id);}
       jj_consume_token(47);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VARIABLE_TYPE:
@@ -489,6 +510,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       FunctionBody();
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
+                if (!curEnv.isReturned())
+                        {if (true) throw new ParseException("Function "+ id + "() not return");}
                 curEnv = savedEnv;
     } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -899,13 +922,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       default:
         jj_la1[26] = jj_gen;
         if (jj_2_3(10)) {
+          AssignmentExpression();
+          jj_consume_token(46);
+        } else if (jj_2_4(3)) {
           PostIncDecExpression();
           jj_consume_token(46);
-        } else if (jj_2_4(10)) {
+        } else if (jj_2_5(3)) {
           PreIncDecExpression();
           jj_consume_token(46);
-        } else if (jj_2_5(10)) {
-          AssignmentExpression();
+        } else if (jj_2_6(2)) {
+          MyID();
+          FunctionInvoke();
           jj_consume_token(46);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -981,7 +1008,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                 curEnv = savedEnv;
       label_7:
       while (true) {
-        if (jj_2_6(2)) {
+        if (jj_2_7(2)) {
           ;
         } else {
           break label_7;
@@ -1120,6 +1147,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
                                 type = curEnv.get(id);
                                 if (type == null)
                                         {if (true) throw new ParseException("Undifine id in forStatement: " + id);}
+                                else if (type.isFunc)
+                                        {if (true) throw new ParseException("Error type in forStatement");}
                         }
       jj_consume_token(ASSIGNMENT_EQUAL_OPERATOR);
       paraL = Expression();
@@ -1234,6 +1263,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         ASTReturnStatement jjtn000 = new ASTReturnStatement(JJTRETURNSTATEMENT);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);int paraL;
+        Type funcType = curEnv.getFunType();
     try {
       jj_consume_token(RETURN);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1248,6 +1278,15 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case 71:
       case 72:
         paraL = Expression();
+                        if (funcType == Type.Void)
+                                {if (true) throw new ParseException("Error type of return");}
+                        else if ((funcType == Type.Int) && ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char)))
+                                {if (true) throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);}
+                        else if ((funcType == Type.Real) && (!Type.numeric(jjtn000.typeRight)))
+                                {if (true) throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);}
+                        else if (funcType != jjtn000.typeRight)
+                                {if (true) throw new ParseException("Error type of return /" + funcType.name + " " + jjtn000.typeRight.name);}
+                        curEnv.setReturned(true);
                         jjtn000.genInter(paraL, 0);
         break;
       default:
@@ -1300,7 +1339,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      if (jj_2_7(5)) {
+      if (jj_2_8(5)) {
         AssignmentExpression();
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
@@ -1360,6 +1399,32 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         int paraR;
     try {
       lhs = LeftSide();
+                Type type;
+                int i = lhs.indexOf("[");
+                String s = lhs;
+                if (i != -1)
+                        s = lhs.substring(0, i);
+                type = curEnv.get(s);
+                if (type == null)
+                        {if (true) throw new ParseException("Undifine : "+ lhs);}
+                if (type.isFunc)
+                        {if (true) throw new ParseException("Invalid parameter: "+ lhs);}
+                if (type.isArray)
+                {
+                        if (i == -1)
+                                {if (true) throw new ParseException("Invalid access to array: "+ lhs);}
+                        s = type.name;
+                        if (s.compareTo("int") == 0)
+                                type = Type.Int;
+                        else if (s.compareTo("bool") == 0)
+                                type = Type.Int;
+                        else if (s.compareTo("real") == 0)
+                                type = Type.Int;
+                        else if (s.compareTo("char") == 0)
+                                type = Type.Int;
+                        else
+                                {if (true) throw new ParseException("Invalid type of array: "+ lhs);}
+                }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_OPERATOR:
         op = jj_consume_token(ASSIGNMENT_OPERATOR);
@@ -1375,11 +1440,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       paraR = Expression();
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-                Type type = curEnv.get(lhs);
-                if (type == null)
-                        {if (true) throw new ParseException("Undifine: "+ lhs);}
-                if (type.isFunc)
-                        {if (true) throw new ParseException("Invalid parameter: "+ lhs);}
                 if ((type == Type.Bool) && (jjtn000.typeRight != Type.Bool))
                         {if (true) throw new ParseException("Error type of op: " + op.image + " / "+ type.name + " " + jjtn000.typeRight.name);}
                 if ((type != Type.Bool) && (jjtn000.typeRight == Type.Bool))
@@ -2307,6 +2367,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t1;
         String lhs;
+        boolean isFuncInvoke = false;
+        int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INTEGER_LITERAL:
@@ -2345,7 +2407,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         lhs = LeftSide();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 47:
-          FunctionInvoke();
+          isFuncInvoke = FunctionInvoke();
           break;
         default:
           jj_la1[53] = jj_gen;
@@ -2353,18 +2415,54 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         }
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-                Type type = curEnv.get(lhs);
-                if (type == null)
-                        {if (true) throw new ParseException("Undifine: "+ lhs);}
-                if (type.isFunc)
-                        {if (true) throw new ParseException("Invalid parameter: "+ lhs);}
-                jjtn000.typeRight = type;
-                jjtn000.setName(lhs);
-                {if (true) return jjtn000.genInter();}
+                if(isFuncInvoke)
+                {
+                        Type type = curEnv.getFuncType(lhs);
+                        if (type == null)
+                                {if (true) throw new ParseException("Undifine function: "+ lhs);}
+                        jjtn000.typeRight = type;
+                        jjtn000.setName(lhs);
+                        {if (true) return 0;}
+                }
+                else
+                {
+                        Type type;
+                        int i = lhs.indexOf("[");
+                        String s = lhs;
+                        if (i != -1)
+                                s = lhs.substring(0, i);
+                        type = curEnv.get(s);
+                        if (type == null)
+                                {if (true) throw new ParseException("Undifine : "+ lhs);}
+                        if (type.isFunc)
+                                {if (true) throw new ParseException("Invalid parameter: "+ lhs);}
+                        if (type.isArray)
+                        {
+                                if (i == -1)
+                                        {if (true) throw new ParseException("Invalid access to array: "+ lhs);}
+                                s = type.name;
+                                if (s.compareTo("int") == 0)
+                                        type = Type.Int;
+                                else if (s.compareTo("bool") == 0)
+                                        type = Type.Int;
+                                else if (s.compareTo("real") == 0)
+                                        type = Type.Int;
+                                else if (s.compareTo("char") == 0)
+                                        type = Type.Int;
+                                else
+                                        {if (true) throw new ParseException("Invalid type of array: "+ lhs);}
+                        }
+                        jjtn000.typeRight = type;
+                        jjtn000.setName(lhs);
+                        {if (true) return jjtn000.genInter();}
+                }
         break;
       case 47:
         jj_consume_token(47);
-        Primary2();
+        paraR = Primary2();
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraR;}
         break;
       default:
         jj_la1[54] = jj_gen;
@@ -2394,8 +2492,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   }
 
 /** FunctionInvoke. */
-  final public void FunctionInvoke() throws ParseException {
-                         /*@bgen(jjtree) FunctionInvoke */
+  final public boolean FunctionInvoke() throws ParseException {
+                            /*@bgen(jjtree) FunctionInvoke */
   ASTFunctionInvoke jjtn000 = new ASTFunctionInvoke(JJTFUNCTIONINVOKE);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
@@ -2432,6 +2530,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         ;
       }
       jj_consume_token(48);
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return true;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -2451,14 +2552,15 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** primary2. */
-  final public void Primary2() throws ParseException {
-                   /*@bgen(jjtree) Primary2 */
-  ASTPrimary2 jjtn000 = new ASTPrimary2(JJTPRIMARY2);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public int Primary2() throws ParseException {
+ /*@bgen(jjtree) Primary2 */
+        ASTPrimary2 jjtn000 = new ASTPrimary2(JJTPRIMARY2);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);int paraR;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INTEGER_LITERAL:
@@ -2471,8 +2573,11 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case 65:
       case 71:
       case 72:
-        Expression();
+        paraR = Expression();
         jj_consume_token(48);
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paraR;}
         break;
       case VARIABLE_TYPE:
         jj_consume_token(VARIABLE_TYPE);
@@ -2503,6 +2608,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** left side. */
@@ -2512,10 +2618,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t1;
         Token t2;
+        String ret;
+        int paraR;
     try {
       t1 = jj_consume_token(IDENTIFIER);
-                jjtn000.setName(t1.image);
-                {if (true) return t1.image;}
+                ret = t1.image;
+                jjtn000.setName(ret);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 42:
       case 73:
@@ -2527,7 +2635,11 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break;
         case 42:
           jj_consume_token(42);
-          Expression();
+          paraR = Expression();
+                                if ((jjtn000.typeRight != Type.Int) && (jjtn000.typeRight != Type.Char))
+                                        {if (true) throw new ParseException("Error type of index when referring array: "+ t1.image);}
+                                ret = t1.image + "[@t" + paraR + "]";
+                                jjtn000.setName(ret);
           jj_consume_token(43);
           break;
         default:
@@ -2540,6 +2652,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         jj_la1[59] = jj_gen;
         ;
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return ret;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -2631,12 +2746,162 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     finally { jj_save(6, xla); }
   }
 
-  private boolean jj_3R_69() {
-    if (jj_scan_token(CHARACTER_LITERAL)) return true;
+  private boolean jj_2_8(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_8(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(7, xla); }
+  }
+
+  private boolean jj_3R_54() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(62)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(63)) return true;
+    }
+    if (jj_3R_53()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_29() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_33()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_38() {
+    if (jj_scan_token(50)) return true;
+    if (jj_3R_29()) return true;
+    if (jj_scan_token(49)) return true;
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_61() {
+    if (jj_scan_token(65)) return true;
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_40() {
+    if (jj_scan_token(51)) return true;
+    if (jj_3R_39()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_45() {
+    if (jj_3R_47()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_48()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_60() {
+    if (jj_scan_token(64)) return true;
+    if (jj_3R_57()) return true;
     return false;
   }
 
   private boolean jj_3R_51() {
+    if (jj_3R_53()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_54()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_35() {
+    if (jj_scan_token(42)) return true;
+    if (jj_3R_29()) return true;
+    if (jj_scan_token(43)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_71() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_73()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_32() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_34()) {
+    jj_scanpos = xsp;
+    if (jj_3R_35()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_34() {
+    if (jj_scan_token(73)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_59() {
+    if (jj_3R_62()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_57() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_59()) {
+    jj_scanpos = xsp;
+    if (jj_3R_60()) {
+    jj_scanpos = xsp;
+    if (jj_3R_61()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_37() {
+    if (jj_3R_39()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_40()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_46() {
+    if (jj_scan_token(54)) return true;
+    if (jj_3R_45()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_70() {
+    if (jj_scan_token(CHARACTER_LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_3R_24()) return true;
+    if (jj_3R_25()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_52() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(58)) {
@@ -2649,311 +2914,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     }
     }
     }
-    if (jj_3R_50()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_68() {
-    if (jj_scan_token(BOOLEAN_LITERAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_35() {
-    if (jj_3R_36()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_3R_44()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_45()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_57() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(66)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(67)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(68)) return true;
-    }
-    }
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_67() {
-    if (jj_scan_token(REAL_LITERAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_48() {
-    if (jj_3R_50()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_51()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_66() {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_65() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_66()) {
-    jj_scanpos = xsp;
-    if (jj_3R_67()) {
-    jj_scanpos = xsp;
-    if (jj_3R_68()) {
-    jj_scanpos = xsp;
-    if (jj_3R_69()) {
-    jj_scanpos = xsp;
-    if (jj_3R_70()) {
-    jj_scanpos = xsp;
-    if (jj_3R_71()) return true;
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_scan_token(IF)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_54() {
-    if (jj_3R_56()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_57()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_43() {
-    if (jj_scan_token(53)) return true;
-    if (jj_3R_42()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_49() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(56)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(57)) return true;
-    }
-    if (jj_3R_48()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(40)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(39)) return true;
-    }
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_64() {
-    if (jj_scan_token(72)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_40() {
-    if (jj_3R_42()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_43()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_34() {
-    if (jj_scan_token(42)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(43)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_55() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(64)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(65)) return true;
-    }
-    if (jj_3R_54()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_63() {
-    if (jj_scan_token(71)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(41)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_31() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_33()) {
-    jj_scanpos = xsp;
-    if (jj_3R_34()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_33() {
-    if (jj_scan_token(73)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_30() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_32() {
-    if (jj_3R_35()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_46() {
-    if (jj_3R_48()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_49()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_62() {
-    if (jj_3R_65()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_61() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_62()) {
-    jj_scanpos = xsp;
-    if (jj_3R_63()) {
-    jj_scanpos = xsp;
-    if (jj_3R_64()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_41() {
-    if (jj_scan_token(52)) return true;
-    if (jj_3R_40()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_28() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_52() {
-    if (jj_3R_54()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_55()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_78() {
-    if (jj_scan_token(41)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_27() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_31()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_29()) {
-    jj_scanpos = xsp;
-    if (jj_3R_30()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(69)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(70)) return true;
-    }
+    if (jj_3R_51()) return true;
     return false;
   }
 
@@ -2963,15 +2924,14 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_3R_22()) return true;
-    if (jj_scan_token(46)) return true;
+  private boolean jj_3R_69() {
+    if (jj_scan_token(BOOLEAN_LITERAL)) return true;
     return false;
   }
 
-  private boolean jj_3R_47() {
-    if (jj_scan_token(55)) return true;
-    if (jj_3R_46()) return true;
+  private boolean jj_3_4() {
+    if (jj_3R_22()) return true;
+    if (jj_scan_token(46)) return true;
     return false;
   }
 
@@ -2981,20 +2941,145 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_38() {
-    if (jj_3R_40()) return true;
+  private boolean jj_3R_36() {
+    if (jj_3R_37()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_38()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_32()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_43() {
+    if (jj_3R_45()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_41()) { jj_scanpos = xsp; break; }
+      if (jj_3R_46()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3R_68() {
+    if (jj_scan_token(REAL_LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(41)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_58() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(66)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(67)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(68)) return true;
+    }
+    }
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_49() {
+    if (jj_3R_51()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_52()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_78() {
+    if (jj_scan_token(41)) return true;
+    if (jj_3R_29()) return true;
     return false;
   }
 
   private boolean jj_3R_76() {
     if (jj_scan_token(VARIABLE_TYPE)) return true;
     if (jj_scan_token(48)) return true;
-    if (jj_3R_61()) return true;
+    if (jj_3R_62()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_67() {
+    if (jj_scan_token(INTEGER_LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_66() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_67()) {
+    jj_scanpos = xsp;
+    if (jj_3R_68()) {
+    jj_scanpos = xsp;
+    if (jj_3R_69()) {
+    jj_scanpos = xsp;
+    if (jj_3R_70()) {
+    jj_scanpos = xsp;
+    if (jj_3R_71()) {
+    jj_scanpos = xsp;
+    if (jj_3R_72()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    if (jj_scan_token(42)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_75() {
+    if (jj_3R_29()) return true;
+    if (jj_scan_token(48)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_74() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_75()) {
+    jj_scanpos = xsp;
+    if (jj_3R_76()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_3R_57()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_58()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_44() {
+    if (jj_scan_token(53)) return true;
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_20()) return true;
     return false;
   }
 
@@ -3010,35 +3095,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_22() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(69)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(70)) return true;
-    }
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_75() {
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_73() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_75()) {
-    jj_scanpos = xsp;
-    if (jj_3R_76()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3R_77() {
-    if (jj_3R_28()) return true;
+    if (jj_3R_29()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
@@ -3047,23 +3105,39 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_53() {
+  private boolean jj_3R_50() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(62)) {
+    if (jj_scan_token(56)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(63)) return true;
+    if (jj_scan_token(57)) return true;
     }
-    if (jj_3R_52()) return true;
+    if (jj_3R_49()) return true;
     return false;
   }
 
-  private boolean jj_3R_72() {
-    if (jj_3R_74()) return true;
+  private boolean jj_3R_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) return true;
+    }
     return false;
   }
 
-  private boolean jj_3R_74() {
+  private boolean jj_3R_30() {
+    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_65() {
+    if (jj_scan_token(72)) return true;
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
     if (jj_scan_token(47)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -3072,54 +3146,108 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_60() {
-    if (jj_scan_token(65)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_37() {
-    if (jj_scan_token(50)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(49)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_44() {
-    if (jj_3R_46()) return true;
+  private boolean jj_3R_41() {
+    if (jj_3R_43()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_47()) { jj_scanpos = xsp; break; }
+      if (jj_3R_44()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3R_39() {
-    if (jj_scan_token(51)) return true;
-    if (jj_3R_38()) return true;
+  private boolean jj_3R_56() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(64)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(65)) return true;
+    }
+    if (jj_3R_55()) return true;
     return false;
   }
 
-  private boolean jj_3R_71() {
+  private boolean jj_3R_64() {
+    if (jj_scan_token(71)) return true;
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_72() {
     if (jj_scan_token(47)) return true;
-    if (jj_3R_73()) return true;
+    if (jj_3R_74()) return true;
     return false;
   }
 
-  private boolean jj_3R_59() {
-    if (jj_scan_token(64)) return true;
-    if (jj_3R_56()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_50() {
-    if (jj_3R_52()) return true;
+  private boolean jj_3R_47() {
+    if (jj_3R_49()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_53()) { jj_scanpos = xsp; break; }
+      if (jj_3R_50()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_63() {
+    if (jj_3R_66()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_62() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_63()) {
+    jj_scanpos = xsp;
+    if (jj_3R_64()) {
+    jj_scanpos = xsp;
+    if (jj_3R_65()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_scan_token(52)) return true;
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    if (jj_3R_55()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_56()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(40)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(39)) return true;
+    }
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(69)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(70)) return true;
     }
     return false;
   }
@@ -3136,54 +3264,54 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     if (jj_scan_token(VARIABLE_TYPE)) return true;
     if (jj_3R_24()) return true;
     xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
+    if (jj_3R_26()) jj_scanpos = xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+      if (jj_3R_27()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(46)) return true;
     return false;
   }
 
-  private boolean jj_3R_70() {
-    if (jj_3R_27()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_72()) jj_scanpos = xsp;
+  private boolean jj_3R_48() {
+    if (jj_scan_token(55)) return true;
+    if (jj_3R_47()) return true;
     return false;
   }
 
-  private boolean jj_3R_58() {
-    if (jj_3R_61()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_56() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_58()) {
-    jj_scanpos = xsp;
-    if (jj_3R_59()) {
-    jj_scanpos = xsp;
-    if (jj_3R_60()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_36() {
-    if (jj_3R_38()) return true;
+  private boolean jj_3R_39() {
+    if (jj_3R_41()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_39()) { jj_scanpos = xsp; break; }
+      if (jj_3R_42()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3R_45() {
-    if (jj_scan_token(54)) return true;
-    if (jj_3R_44()) return true;
+  private boolean jj_3R_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(69)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(70)) return true;
+    }
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_33() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_73() {
+    if (jj_3R_25()) return true;
     return false;
   }
 
@@ -3216,7 +3344,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
    private static void jj_la1_init_2() {
       jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60,0x60,0x60,0x60,0x0,0x0,0x0,0x0,0x183,0x183,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x3,0x1c,0x1c,0x183,0x60,0x60,0x180,0x0,0x0,0x0,0x183,0x183,0x200,0x200,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[7];
+  final private JJCalls[] jj_2_rtns = new JJCalls[8];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -3450,7 +3578,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -3464,6 +3592,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             case 4: jj_3_5(); break;
             case 5: jj_3_6(); break;
             case 6: jj_3_7(); break;
+            case 7: jj_3_8(); break;
           }
         }
         p = p.next;
