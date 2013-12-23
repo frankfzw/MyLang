@@ -6,13 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Hashtable;
-
-import asm.IFG.REG;
 
 public class Asm {
-	
-	
+
 	public static final int INVALID = -1;
 	public static final int ASSIGNMENT = 0;
 	public static final int THREEADDRESS = 1;
@@ -26,29 +22,14 @@ public class Asm {
 	private String funcList = "";
 	private String uniParaList = "";
 	private ArrayList<String> asm = new ArrayList<String>();
-	private String prevFunc;
-	
-	//translate id to reg and memory address
-	private static Hashtable idToReg = new Hashtable();
-	private static ArrayList<String> local = new ArrayList();
-	private static Hashtable localToMem =new Hashtable();
 	
 	public String getFuncList() {
 		return funcList;
 	}
 	
 	//cr: changed here
-	public void setFuncList(ArrayList<String> list) {
-		for (String s : list) {
-			String[] temp = s.split(" ");
-			String funcProto = temp[0] + " proto ";
-			for (int i = 3; i < temp.length; i ++) {
-				String type = temp[i].split(":")[1];
-				funcProto += ":" + type + " ";
-			}
-			funcList += funcProto + "\n";
-		}
-		//System.out.println(funcList);
+	public void setFuncList() {
+		
 	}
 	
 	public String getUniParaList() {
@@ -95,18 +76,14 @@ public class Asm {
 		int length = ins.length;
 		int val = 0;
 		int index = 0;
-		int i = 0;
-		while (ins[i].indexOf("@L") != -1)
+		if (ins[0].indexOf("@L") != -1)
 		{
 			length --;
 			val += LABEL;
 			index ++;
-			i ++;
-			if (i == ins.length)
-				break;
 		}
 		if (length == 0)
-			return LABEL + val;
+			return INVALID;
 		if ((length == 3) && (ins[1 + index].compareTo("=") == 0))
 			return ASSIGNMENT + val;
 		if ((length == 5) && (ins[1 + index].compareTo("=") == 0))
@@ -134,7 +111,7 @@ public class Asm {
 		FileWriter writer = new FileWriter(file);
 		
 		String content = ".386\n"
-				+ ".model flat,stdcall\n"
+				+ ".model flat,stdcall"
 				+ "option casemap:none\n\n"
 				+ funcList
 				+ "\n\n"
@@ -166,15 +143,10 @@ public class Asm {
 			String ins[] = content.split(" ");
 			int type = parseLine(ins);
 			int pos = 0;
-			int i = 0;
-			while (type >= LABEL) {
-				if (i == ins.length)
-					break;
+			if (type >= LABEL) {
 				pos ++;
-				asm.add(ins[i]);
+				asm.add(ins[0]);
 				type -= LABEL;
-				i ++;
-				
 			}
 			switch(type) {
 			case ASSIGNMENT:
@@ -211,8 +183,6 @@ public class Asm {
 			writer.write(s);
 			writer.write("\n");
 		}
-		writer.write(prevFunc + " endp" + "\n\n");
-		writer.write("end start");
 		writer.close();
 	}
 	public void transAssignment(int pos, String[] ins) {
@@ -225,34 +195,33 @@ public class Asm {
 		asm.add(temp);
 	}
 	public void transThreeAddress(int pos, String[] ins) {
-		String op = ins[3 + pos];
-		String temp = "mov eax, "  + transPara(ins[pos + 2]);
+		String op = ins[2 + pos];
+		String temp = "mov " + transPara(ins[pos]) + ", "  + transPara(ins[pos + 2]);
 		asm.add(temp);
 		if(op.compareTo("+") == 0) {
 			//add
-			temp = "add eax, " + transPara(ins[pos + 4]);
+			temp = "add " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
 			asm.add(temp);
-			//return;
+			return;
 		}
 		if(op.compareTo("-") == 0) {
 			//sub
-			temp = "dec eax, " + transPara(ins[pos + 4]);
+			temp = "dec " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
 			asm.add(temp);
-			//return;
+			return;
 		}
 		if(op.compareTo("*") == 0) {
 			//multi
-			temp = "mul eax, " + transPara(ins[pos + 4]);
+			temp = "mul " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
 			asm.add(temp);
-			//return;
+			return;
 		}
 		if(op.compareTo("/") == 0) {
 			//div
-			temp = "div eax, " + transPara(ins[pos + 4]);
+			temp = "div " + transPara(ins[pos]) + ", " + transPara(ins[pos + 4]);
 			asm.add(temp);
-			//return;
+			return;
 		}
-		asm.add("mov " + transPara(ins[pos]) + ", eax");
 	}
 	public void transGoto(int pos, String[] ins) {
 		String temp = "jmp " + ins[1 + pos];
@@ -287,11 +256,20 @@ public class Asm {
 		asm.add(temp);
 	}
 	public void transFunc(int pos, String[] ins) {
-		if (prevFunc != null) {
-			asm.add(prevFunc + " endp" + "\n");
+		String temp = ins[0 + pos] + " " + ins[1 + pos] + " ";
+		for(int i = pos + 3; i < ins.length; i ++) {
+			String para[] = ins[i].split(":");
+			if(para[1].compareTo("int") == 0) {
+				para[1] = "dword";
+			}
+			else if(para[1].compareTo("real") == 0) {
+				para[1] = "real8";
+			}
+			else {
+				para[1] = "byte";
+			}
+			temp += para[0] + ":" + para[1] + " ";
 		}
-		prevFunc = ins[pos + 1];
-		String temp = transType(pos, ins);
 		asm.add(temp);
 	}
 	public void transInvoke(int pos, String[] ins) {
@@ -314,57 +292,7 @@ public class Asm {
 	}
 	
 	public String transPara(String para) {
-		if (Character.isDigit(para.charAt(0)))
-			return para;
-		String reg = "";
-		if (idToReg.containsKey(para)) {
-			reg = idToReg.get(para).toString().toLowerCase();
-			return reg;
-		}
-		else {
-			//finish later
-			return para;
-		}
+		return para;
 	}
-	
-	public String transType(int pos, String[] ins) {
-		String temp = ins[1 + pos] + " " + ins[2 + pos] + " ";
-		for(int i = pos + 3; i < ins.length; i ++) {
-			String para[] = ins[i].split(":");
-			if(para[1].compareTo("int") == 0) {
-				para[1] = "dword";
-			}
-			else if(para[1].compareTo("real") == 0) {
-				para[1] = "real8";
-			}
-			else {
-				para[1] = "byte";
-			}
-			temp += para[0] + ":" + para[1] + " ";
-		}
-		return temp;
-	}
-	
-
-	public static Hashtable getIdToReg() {
-		return idToReg;
-	}
-
-	public static void setIdToReg(Hashtable idToReg) {
-		Asm.idToReg = idToReg;
-	}
-
-	public static ArrayList<String> getLocal() {
-		return local;
-	}
-
-	public static void setLocal(ArrayList<String> local) {
-		Asm.local = local;
-		int i = 0;
-		for (String s : local) {
-			localToMem.put(local, i);
-		}
-	}
-
 	
 }

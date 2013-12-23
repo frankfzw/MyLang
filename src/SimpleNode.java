@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import symbols.Type;
 
@@ -18,8 +17,8 @@ public class SimpleNode implements Node {
   protected static int oldLabel = 0;
   protected String content;
   
-  protected static ArrayList<Integer> breakLabel = new ArrayList<Integer>();
-  protected static ArrayList<Integer> continueLabel = new ArrayList<Integer>();
+  protected static int breakLabel;
+  protected static int continueLabel;
   
   public static Type typeRight;
 

@@ -3,8 +3,8 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream; 
 import java.io.IOException;
 
-//import com.sun.image.codec.jpeg.JPEGCodec; 
-//import com.sun.image.codec.jpeg.JPEGImageEncoder; 
+import com.sun.image.codec.jpeg.JPEGCodec; 
+import com.sun.image.codec.jpeg.JPEGImageEncoder; 
 
 
 public class JjtImage 
@@ -56,8 +56,8 @@ public class JjtImage
 		{
 			addNodeToImg(n, 1000, 10);			
 			FileOutputStream fos = new FileOutputStream( "src\\img.jpg"); 
-			//JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(fos); 
-			//encoder.encode(bufImage);
+			JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(fos); 
+			encoder.encode(bufImage);
 		}
 		catch(Exception e)
 		{

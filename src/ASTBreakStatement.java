@@ -13,9 +13,7 @@ class ASTBreakStatement extends SimpleNode {
   }
   
   public int genInter() throws IOException {
-	  int label = breakLabel.get(breakLabel.size() - 1);
-	  //breakLabel.remove(breakLabel.size() - 1);
-	  content = "goto @L" + Integer.toString(label)
+	  content = "got @L" + Integer.toString(breakLabel)
 			  + "\n";
 	  writeInter();
 	  return para;

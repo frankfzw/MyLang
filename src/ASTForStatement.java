@@ -6,7 +6,6 @@ public
 class ASTForStatement extends SimpleNode {
 	private int headLabel;
 	private int tailLabel;
-	private int conTarLabel;
 	private String name;
 	
   public ASTForStatement(int id) {
@@ -18,12 +17,10 @@ class ASTForStatement extends SimpleNode {
   }
 
   public int writeHeadLabel() throws IOException {
-	  //useless here
-	  
-	  //headLabel = genLabel();
-	  //continueLabel = headLabel;
-	  //content = "@L" + Integer.toString(headLabel) + ": ";
-	  //writeInter();
+	  headLabel = genLabel();
+	  continueLabel = headLabel;
+	  content = "@L" + Integer.toString(headLabel) + ": ";
+	  writeInter();
 	  return headLabel;
   }
   
@@ -31,7 +28,7 @@ class ASTForStatement extends SimpleNode {
 	  name = id;
 	  tailLabel = genLabel();
 	  headLabel = genLabel();
-	  breakLabel.add(tailLabel);
+	  breakLabel = tailLabel;
 	  content = id + " = @t" + Integer.toString(paraL)
 			  //+ "\n@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
 			  //+ "\nif @t" + Integer.toString(paraL) + " > " + "@t" + Integer.toString(paraR)
@@ -41,18 +38,14 @@ class ASTForStatement extends SimpleNode {
 			  //+ "@t" + Integer.toString(paraL) + " = " + "@t" + Integer.toString(paraL) + " + 1\n";
 			  
 	  writeInter();
-	  conTarLabel = genLabel();
-	  continueLabel.add(conTarLabel);
 	  return para;
   }
   
   public int writeTailLabel() throws IOException {
-	  content = "@L" + Integer.toString(conTarLabel) + ": " + name + " = " + name + " + 1\n" 
+	  content = name + " = " + name + " + 1\n" 
 			  + "goto @L" + Integer.toString(headLabel)
 			  + "\n@L" + Integer.toString(tailLabel) + ": ";
 	  writeInter();
-	  breakLabel.remove(breakLabel.size() - 1);
-	  continueLabel.remove(continueLabel.size() - 1);
 	  return tailLabel;
   }
 }

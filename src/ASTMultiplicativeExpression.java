@@ -22,7 +22,7 @@ public class ASTMultiplicativeExpression extends SimpleNode {
 	public int genInter(int paraL, int paraR) throws IOException {
 		content = "@t"
 				+ Integer.toString(genPara()) + " = "
-				+ "@t" + Integer.toString(paraL)
+				+ " @t" + Integer.toString(paraL)
 				+ " " + op
 				+ " @t" + Integer.toString(paraR)
 				+ "\n";

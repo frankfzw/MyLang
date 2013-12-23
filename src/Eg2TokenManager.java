@@ -2,6 +2,7 @@
 /** An Arithmetic Grammar. */
 //package Parser;
 import symbols.*;
+import java.util.ArrayList;
 
 /** Token Manager. */
 public class Eg2TokenManager implements Eg2Constants

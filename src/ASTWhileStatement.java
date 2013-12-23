@@ -17,7 +17,7 @@ class ASTWhileStatement extends SimpleNode {
   
   public int writeHeadLabel() throws IOException {
 	  headLabel = genLabel();
-	  continueLabel.add(headLabel);
+	  continueLabel = headLabel;
 	  content = "@L" + Integer.toString(headLabel) + ": ";
 	  writeInter();
 	  return headLabel;
@@ -25,7 +25,7 @@ class ASTWhileStatement extends SimpleNode {
   
   public int genInter(int paraL, int paraR) throws IOException {
 	  tailLabel = genLabel();
-	  breakLabel.add(tailLabel);
+	  breakLabel = tailLabel;
 	  content = "@t" + Integer.toString(genPara()) + " = @t" + Integer.toString(paraR)
 			  + "\nif @t" + Integer.toString(para) + " == 0 goto @L" + Integer.toString(tailLabel)
 			  + "\n";
@@ -37,8 +37,6 @@ class ASTWhileStatement extends SimpleNode {
 	  content = "goto @L" + Integer.toString(headLabel)
 			  + "\n@L" + Integer.toString(tailLabel) + ": ";
 	  writeInter();
-	  breakLabel.remove(breakLabel.size() - 1);
-	  continueLabel.remove(continueLabel.size() - 1);
 	  return tailLabel;
   }
 }

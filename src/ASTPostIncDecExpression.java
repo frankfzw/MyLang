@@ -2,35 +2,13 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class ASTPostIncDecExpression extends SimpleNode {
-	private String op;
-	private String id;
-	
-	public String getOp() {
-		return op;
-	}
+  public ASTPostIncDecExpression(int id) {
+    super(id);
+  }
 
-	public void setOp(String op) {
-		this.op = op;
-	}
+  public ASTPostIncDecExpression(Eg2 p, int id) {
+    super(p, id);
+  }
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public ASTPostIncDecExpression(int id) {
-		super(id);
-	}
-
-	public ASTPostIncDecExpression(Eg2 p, int id) {
-		super(p, id);
-	}
-
-	public int genInter(int paraL, int paraR) {
-		return para;
-	}
 }
 /* JavaCC - OriginalChecksum=0887c044a17e9c8ad62a544af2351ec3 (do not edit this line) */
