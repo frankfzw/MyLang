@@ -7,9 +7,10 @@
 //6 if elseif else 跳转流
 7 foreach
 //8 break continue
-9 invoke return处理
+//9 invoke return处理
 10 struct的类型返回
 11 struct 访问a.ab类型检查
+12 array初始化
 
 //--------------------------------------
 int b(int a)

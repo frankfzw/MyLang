@@ -2,9 +2,11 @@
 /** An Arithmetic Grammar. */
 //package Parser;
 import symbols.*;
+import java.util.ArrayList;
 
 public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@bgen(jjtree)*/
   protected JJTEg2State jjtree = new JJTEg2State();Env curEnv = null;       // current symbol table
+        FuncTable funcTable = new FuncTable();
         /** Main entry point. */
         public static void main(String args[])
         {
@@ -456,6 +458,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t;
         String id;
+        ArrayList<Type> paras = null;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VOID:
@@ -499,13 +502,14 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VARIABLE_TYPE:
       case CONST:
-        FunctionParameterList();
+        paras = FunctionParameterList();
         break;
       default:
         jj_la1[15] = jj_gen;
         ;
       }
       jj_consume_token(48);
+                funcTable.put(id, new Function(id, paras));
                 jjtn000.writeReturn();
       FunctionBody();
           jjtree.closeNodeScope(jjtn000, true);
@@ -535,13 +539,15 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   }
 
 /** function parameter list. */
-  final public void FunctionParameterList() throws ParseException {
-                                /*@bgen(jjtree) FunctionParameterList */
-  ASTFunctionParameterList jjtn000 = new ASTFunctionParameterList(JJTFUNCTIONPARAMETERLIST);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public ArrayList<Type> FunctionParameterList() throws ParseException {
+ /*@bgen(jjtree) FunctionParameterList */
+        ASTFunctionParameterList jjtn000 = new ASTFunctionParameterList(JJTFUNCTIONPARAMETERLIST);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);Type type;
+        ArrayList<Type> paras = new ArrayList<Type>();
     try {
-      FunctionParameter();
+      type = FunctionParameter();
+                paras.add(type);
       label_5:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -553,8 +559,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           break label_5;
         }
         jj_consume_token(41);
-        FunctionParameter();
+        type = FunctionParameter();
+                        paras.add(type);
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return paras;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -574,15 +584,17 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** function parameter. */
-  final public void FunctionParameter() throws ParseException {
+  final public Type FunctionParameter() throws ParseException {
  /*@bgen(jjtree) FunctionParameter */
         ASTFunctionParameter jjtn000 = new ASTFunctionParameter(JJTFUNCTIONPARAMETER);
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Token t;
         String id;
+        Type type;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case CONST:
@@ -600,7 +612,18 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
                 if (curEnv.contains(id))
                         {if (true) throw new ParseException("Redifine: "+ id);}
-                curEnv.put(id, new Type(t.image, false));
+                String s = t.image;
+                if (s.compareTo("int") == 0)
+                        type = Type.Int;
+                else if (s.compareTo("bool") == 0)
+                        type = Type.Int;
+                else if (s.compareTo("real") == 0)
+                        type = Type.Int;
+                else if (s.compareTo("char") == 0)
+                        type = Type.Int;
+                else
+                        {if (true) throw new ParseException("Invalid type function parameters: "+ id);}
+                curEnv.put(id, type);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASSIGNMENT_EQUAL_OPERATOR:
       case 42:
@@ -642,6 +665,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         jj_la1[21] = jj_gen;
         ;
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                {if (true) return type;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -661,6 +687,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
+    throw new Error("Missing return statement in function");
   }
 
 /** function body. */
@@ -910,10 +937,10 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
 
 /** statement without trailing substatement(simple statement). */
   final public void SimpleStatement() throws ParseException {
-                          /*@bgen(jjtree) SimpleStatement */
-  ASTSimpleStatement jjtn000 = new ASTSimpleStatement(JJTSIMPLESTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+ /*@bgen(jjtree) SimpleStatement */
+        ASTSimpleStatement jjtn000 = new ASTSimpleStatement(JJTSIMPLESTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);String id;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 46:
@@ -931,8 +958,8 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           PreIncDecExpression();
           jj_consume_token(46);
         } else if (jj_2_6(2)) {
-          MyID();
-          FunctionInvoke();
+          id = MyID();
+          FunctionInvoke(id);
           jj_consume_token(46);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -2407,7 +2434,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
         lhs = LeftSide();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 47:
-          isFuncInvoke = FunctionInvoke();
+          isFuncInvoke = FunctionInvoke(lhs);
           break;
         default:
           jj_la1[53] = jj_gen;
@@ -2492,11 +2519,12 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
   }
 
 /** FunctionInvoke. */
-  final public boolean FunctionInvoke() throws ParseException {
-                            /*@bgen(jjtree) FunctionInvoke */
-  ASTFunctionInvoke jjtn000 = new ASTFunctionInvoke(JJTFUNCTIONINVOKE);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+  final public boolean FunctionInvoke(String id) throws ParseException {
+ /*@bgen(jjtree) FunctionInvoke */
+        ASTFunctionInvoke jjtn000 = new ASTFunctionInvoke(JJTFUNCTIONINVOKE);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);ArrayList<Type> paras = funcTable.get(id).getParas();
+        ArrayList<Type> temParas = new ArrayList<Type>();
     try {
       jj_consume_token(47);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -2511,6 +2539,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       case 71:
       case 72:
         Expression();
+                        temParas.add(jjtn000.typeRight);
         label_18:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -2523,6 +2552,7 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
           }
           jj_consume_token(41);
           Expression();
+                                temParas.add(jjtn000.typeRight);
         }
         break;
       default:
@@ -2532,6 +2562,19 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
       jj_consume_token(48);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
+                if(paras.size() != temParas.size())
+                        {if (true) throw new ParseException("Unmatched size of array parameters: "+ id);}
+                for(int i = 0; i < paras.size(); i++)
+                {
+                        Type type1 = paras.get(i);
+                        Type type2 = temParas.get(i);
+                        if (((type1 == Type.Bool) && (type2 != Type.Bool)) || ((type1 != Type.Bool) && (type2 == Type.Bool)))
+                                {if (true) throw new ParseException("Unmatched type in function parameters: " + id);}
+                        if ((type1 == Type.Char) && ((type2 != Type.Real) || (type2 != Type.Int)))
+                                {if (true) throw new ParseException("Unmatched type in function parameters: " + id);}
+                        if ((type1 == Type.Int) && (type2 == Type.Real))
+                                {if (true) throw new ParseException("Unmatched type in function parameters: " + id);}
+                }
                 {if (true) return true;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -2753,6 +2796,293 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     finally { jj_save(7, xla); }
   }
 
+  private boolean jj_3R_49() {
+    if (jj_3R_51()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_52()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_67() {
+    if (jj_scan_token(INTEGER_LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_66() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_67()) {
+    jj_scanpos = xsp;
+    if (jj_3R_68()) {
+    jj_scanpos = xsp;
+    if (jj_3R_69()) {
+    jj_scanpos = xsp;
+    if (jj_3R_70()) {
+    jj_scanpos = xsp;
+    if (jj_3R_71()) {
+    jj_scanpos = xsp;
+    if (jj_3R_72()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_77() {
+    if (jj_3R_29()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_78()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_55() {
+    if (jj_3R_57()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_58()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_44() {
+    if (jj_scan_token(53)) return true;
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    if (jj_scan_token(47)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_77()) jj_scanpos = xsp;
+    if (jj_scan_token(48)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_50() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(56)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(57)) return true;
+    }
+    if (jj_3R_49()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_65() {
+    if (jj_scan_token(72)) return true;
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41() {
+    if (jj_3R_43()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_44()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(64)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(65)) return true;
+    }
+    if (jj_3R_55()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_64() {
+    if (jj_scan_token(71)) return true;
+    if (jj_3R_57()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_72() {
+    if (jj_scan_token(47)) return true;
+    if (jj_3R_74()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_47() {
+    if (jj_3R_49()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_50()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(41)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_63() {
+    if (jj_3R_66()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_62() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_63()) {
+    jj_scanpos = xsp;
+    if (jj_3R_64()) {
+    jj_scanpos = xsp;
+    if (jj_3R_65()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_scan_token(52)) return true;
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_53() {
+    if (jj_3R_55()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_56()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_35() {
+    if (jj_scan_token(42)) return true;
+    if (jj_3R_29()) return true;
+    if (jj_scan_token(43)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    if (jj_scan_token(42)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(40)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(39)) return true;
+    }
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_32() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_34()) {
+    jj_scanpos = xsp;
+    if (jj_3R_35()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_34() {
+    if (jj_scan_token(73)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    if (jj_3R_28()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(69)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(70)) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(23)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(17)) return true;
+    }
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(47)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_48() {
+    if (jj_scan_token(55)) return true;
+    if (jj_3R_47()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_39() {
+    if (jj_3R_41()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_42()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(69)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(70)) return true;
+    }
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_33() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_73() {
+    if (jj_3R_25()) return true;
+    return false;
+  }
+
   private boolean jj_3R_54() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2761,6 +3091,29 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     if (jj_scan_token(63)) return true;
     }
     if (jj_3R_53()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_30() {
+    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_32()) jj_scanpos = xsp;
     return false;
   }
 
@@ -2809,6 +3162,13 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+  private boolean jj_3R_76() {
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_scan_token(48)) return true;
+    if (jj_3R_62()) return true;
+    return false;
+  }
+
   private boolean jj_3R_60() {
     if (jj_scan_token(64)) return true;
     if (jj_3R_57()) return true;
@@ -2825,13 +3185,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_35() {
-    if (jj_scan_token(42)) return true;
-    if (jj_3R_29()) return true;
-    if (jj_scan_token(43)) return true;
-    return false;
-  }
-
   private boolean jj_3R_71() {
     if (jj_3R_28()) return true;
     Token xsp;
@@ -2840,19 +3193,19 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_32() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_34()) {
-    jj_scanpos = xsp;
-    if (jj_3R_35()) return true;
-    }
+  private boolean jj_3R_75() {
+    if (jj_3R_29()) return true;
+    if (jj_scan_token(48)) return true;
     return false;
   }
 
-  private boolean jj_3R_34() {
-    if (jj_scan_token(73)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
+  private boolean jj_3R_74() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_75()) {
+    jj_scanpos = xsp;
+    if (jj_3R_76()) return true;
+    }
     return false;
   }
 
@@ -2895,6 +3248,11 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
   private boolean jj_3_6() {
     if (jj_3R_24()) return true;
     if (jj_3R_25()) return true;
@@ -2915,6 +3273,22 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     }
     }
     if (jj_3R_51()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(18)) jj_scanpos = xsp;
+    if (jj_scan_token(VARIABLE_TYPE)) return true;
+    if (jj_3R_24()) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_26()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_27()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(46)) return true;
     return false;
   }
 
@@ -2949,11 +3323,9 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_28() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_32()) jj_scanpos = xsp;
+  private boolean jj_3R_78() {
+    if (jj_scan_token(41)) return true;
+    if (jj_3R_29()) return true;
     return false;
   }
 
@@ -2972,11 +3344,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     return false;
   }
 
-  private boolean jj_3R_27() {
-    if (jj_scan_token(41)) return true;
-    return false;
-  }
-
   private boolean jj_3R_58() {
     Token xsp;
     xsp = jj_scanpos;
@@ -2988,330 +3355,6 @@ public class Eg2/*@bgen(jjtree)*/implements Eg2TreeConstants, Eg2Constants {/*@b
     }
     }
     if (jj_3R_57()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_49() {
-    if (jj_3R_51()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_52()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_78() {
-    if (jj_scan_token(41)) return true;
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_76() {
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_scan_token(48)) return true;
-    if (jj_3R_62()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_67() {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_66() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_67()) {
-    jj_scanpos = xsp;
-    if (jj_3R_68()) {
-    jj_scanpos = xsp;
-    if (jj_3R_69()) {
-    jj_scanpos = xsp;
-    if (jj_3R_70()) {
-    jj_scanpos = xsp;
-    if (jj_3R_71()) {
-    jj_scanpos = xsp;
-    if (jj_3R_72()) return true;
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_31() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_75() {
-    if (jj_3R_29()) return true;
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_74() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_75()) {
-    jj_scanpos = xsp;
-    if (jj_3R_76()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_55() {
-    if (jj_3R_57()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_58()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_44() {
-    if (jj_scan_token(53)) return true;
-    if (jj_3R_43()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(23)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(17)) return true;
-    }
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(47)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_77() {
-    if (jj_3R_29()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_78()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_50() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(56)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(57)) return true;
-    }
-    if (jj_3R_49()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_30()) {
-    jj_scanpos = xsp;
-    if (jj_3R_31()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_30() {
-    if (jj_scan_token(ASSIGNMENT_EQUAL_OPERATOR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_65() {
-    if (jj_scan_token(72)) return true;
-    if (jj_3R_57()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    if (jj_scan_token(47)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_77()) jj_scanpos = xsp;
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_41() {
-    if (jj_3R_43()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_44()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_56() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(64)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(65)) return true;
-    }
-    if (jj_3R_55()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_64() {
-    if (jj_scan_token(71)) return true;
-    if (jj_3R_57()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_72() {
-    if (jj_scan_token(47)) return true;
-    if (jj_3R_74()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_47() {
-    if (jj_3R_49()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_50()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_63() {
-    if (jj_3R_66()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_62() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_63()) {
-    jj_scanpos = xsp;
-    if (jj_3R_64()) {
-    jj_scanpos = xsp;
-    if (jj_3R_65()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_42() {
-    if (jj_scan_token(52)) return true;
-    if (jj_3R_41()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_53() {
-    if (jj_3R_55()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_56()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(40)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(39)) return true;
-    }
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_scan_token(IF)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(69)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(70)) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_19()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(18)) jj_scanpos = xsp;
-    if (jj_scan_token(VARIABLE_TYPE)) return true;
-    if (jj_3R_24()) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_26()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_27()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(46)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_48() {
-    if (jj_scan_token(55)) return true;
-    if (jj_3R_47()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_39() {
-    if (jj_3R_41()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_42()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(69)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(70)) return true;
-    }
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_33() {
-    if (jj_3R_36()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_73() {
-    if (jj_3R_25()) return true;
     return false;
   }
 

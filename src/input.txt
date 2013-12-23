@@ -1,5 +1,5 @@
-void a()
+int a(int q)
 {
-	int a;
-	a = (1+2)*3;
+	bool t = a('a');
+	return false;
 }
